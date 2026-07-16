@@ -3,12 +3,17 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import NoteCard from '../components/NoteCard.astro';
 import { siteConfig, nowItems, nowLabels } from '../data/site';
 import { getFeaturedNotes } from '../data/notes';
-import { getAllProjects, getProjectPreviewUrl } from '../data/projects';
+import {
+  getAllProjects,
+  getPreviewHref,
+  isPreviewExternal,
+} from '../data/projects';
 import { path } from '../lib/paths';
 
 const latestNotes = getFeaturedNotes(3);
 const [featuredNote, ...restNotes] = latestNotes;
 const projectCards = getAllProjects();
+const externalPreview = isPreviewExternal();
 ---
 
 <BaseLayout current="home" title={siteConfig.title}>
@@ -86,7 +91,9 @@ const projectCards = getAllProjects();
                   ))}
                 </div>
                 <div class="mini-actions">
-                  <span class="preview-hint">可预览 · 详情内打开</span>
+                  <span class="preview-hint">
+                    {externalPreview ? '可预览 · 新标签打开' : '可预览 · 站内内嵌'}
+                  </span>
                   <span class="go">查看 →</span>
                 </div>
               </div>
@@ -98,7 +105,11 @@ const projectCards = getAllProjects();
       <p class="sr-only">
         {
           projectCards.map((p) => (
-            <a href={getProjectPreviewUrl(p)} target="_blank" rel="noopener noreferrer">
+            <a
+              href={getPreviewHref(p)}
+              target={externalPreview ? '_blank' : undefined}
+              rel={externalPreview ? 'noopener noreferrer' : undefined}
+            >
               预览项目 {p.title}
             </a>
           ))

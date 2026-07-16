@@ -104,6 +104,15 @@ docker push "$DOCKER_USERNAME/personal-dev-website:latest"
 
 服务器为 **HTTP**，与同机 HTTP 演示站（18080/18082 等）协议一致时，**可 iframe 内嵌预览**（若演示站未设置禁止嵌入）。
 
+### 预览模式（双构建）
+
+| 构建 | `DEPLOY_TARGET` | 「预览项目」行为 |
+|------|-----------------|------------------|
+| GitHub Pages | `github`（默认） | 新标签打开演示站 URL（避免 HTTPS 嵌 HTTP） |
+| 服务器 Docker | `server` | 站内 `/projects/:slug/preview` **iframe 内嵌** |
+
+两套产物互不影响：Pages 流水线/脚本仍用 github；本仓库 `Deploy Personal Site` 用 server。
+
 ---
 
 ## 常见问题

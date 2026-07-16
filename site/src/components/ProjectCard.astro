@@ -1,13 +1,19 @@
 ---
 import type { Project } from '../data/projects';
-import { getProjectPreviewUrl, getProjectServices, buildDeployUrl } from '../data/projects';
+import {
+  getPreviewHref,
+  isPreviewExternal,
+  getProjectServices,
+  buildDeployUrl,
+} from '../data/projects';
 import { path } from '../lib/paths';
 
 interface Props {
   project: Project;
 }
 const { project } = Astro.props;
-const preview = getProjectPreviewUrl(project);
+const previewHref = getPreviewHref(project);
+const external = isPreviewExternal();
 const services = getProjectServices(project);
 const primary = services.find((s) => s.isPrimaryPreview) ?? services[0];
 const endpoint =
@@ -40,9 +46,9 @@ const toneClass = project.coverTone;
     <div class="actions">
       <a
         class:list={['btn', 'btn-preview', 'btn-sm', toneClass]}
-        href={preview}
-        target="_blank"
-        rel="noopener noreferrer"
+        href={previewHref}
+        target={external ? '_blank' : undefined}
+        rel={external ? 'noopener noreferrer' : undefined}
       >
         预览项目
       </a>

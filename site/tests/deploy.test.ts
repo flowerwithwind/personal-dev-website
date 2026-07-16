@@ -6,11 +6,15 @@ import {
   getPrimaryPreviewUrl,
   getProjectDeploy,
   isMixedContentEmbedBlocked,
+  useInSitePreview,
 } from '../src/data/deploy';
 import {
   getAllProjects,
   getProjectBySlug,
   getProjectPreviewUrl,
+  getPreviewHref,
+  getInSitePreviewPath,
+  isPreviewExternal,
 } from '../src/data/projects';
 import {
   filterNotesByTag,
@@ -43,11 +47,32 @@ describe('deploy URL mapping', () => {
     const projects = getAllProjects();
     for (const p of projects) {
       expect(p.slug.length).toBeGreaterThan(0);
-      // in-site embed route pattern used by UI
-      const embedPath = `/projects/${p.slug}/preview`;
-      expect(embedPath).toContain('/preview');
+      expect(getInSitePreviewPath(p)).toContain(`/projects/${p.slug}/preview`);
       expect(getProjectPreviewUrl(p)).toContain(DEPLOY_HOST);
     }
+  });
+
+  it('defaults to external new-tab preview (github mode)', () => {
+    const prev = process.env.DEPLOY_TARGET;
+    delete process.env.DEPLOY_TARGET;
+    expect(useInSitePreview()).toBe(false);
+    expect(isPreviewExternal()).toBe(true);
+    const p = getAllProjects()[0];
+    expect(getPreviewHref(p)).toBe(getProjectPreviewUrl(p));
+    if (prev === undefined) delete process.env.DEPLOY_TARGET;
+    else process.env.DEPLOY_TARGET = prev;
+  });
+
+  it('uses in-site preview path when DEPLOY_TARGET=server', () => {
+    const prev = process.env.DEPLOY_TARGET;
+    process.env.DEPLOY_TARGET = 'server';
+    expect(useInSitePreview()).toBe(true);
+    expect(isPreviewExternal()).toBe(false);
+    const p = getAllProjects()[0];
+    expect(getPreviewHref(p)).toBe(getInSitePreviewPath(p));
+    expect(getPreviewHref(p)).toContain('/preview');
+    if (prev === undefined) delete process.env.DEPLOY_TARGET;
+    else process.env.DEPLOY_TARGET = prev;
   });
 
   it('includes documented ports in deploy rows', () => {

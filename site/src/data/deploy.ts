@@ -26,6 +26,23 @@ export type ProjectDeploy = {
 /** 个人站服务器端口（与 deploy/docker-compose.prod.yml 一致） */
 export const PERSONAL_SITE_PORT = 18083;
 
+/**
+ * 是否使用站内 iframe 预览（构建时决定）
+ *
+ * - server：个人站与演示站同为 HTTP → 可内嵌
+ * - github：GitHub Pages 为 HTTPS → 仅新标签打开 HTTP 演示（避免 Mixed Content）
+ *
+ * 由 Dockerfile / CI 注入 DEPLOY_TARGET=server；本地默认 github。
+ */
+export function useInSitePreview(): boolean {
+  try {
+    const t = (typeof process !== 'undefined' && process.env?.DEPLOY_TARGET) || '';
+    return String(t).toLowerCase() === 'server';
+  } catch {
+    return false;
+  }
+}
+
 export const PROJECT_DEPLOYS: ProjectDeploy[] = [
   {
     projectKey: 'smartqa',

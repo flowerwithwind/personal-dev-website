@@ -4,16 +4,17 @@ import ProjectCard from '../../components/ProjectCard.astro';
 import {
   getFeaturedProject,
   getAllProjects,
-  getProjectPreviewUrl,
+  getPreviewHref,
+  isPreviewExternal,
   getProjectServices,
-  buildDeployUrl,
 } from '../../data/projects';
 import { getAllDeployRows, DEPLOY_HOST } from '../../data/deploy';
 import { path } from '../../lib/paths';
 
 const featured = getFeaturedProject()!;
 const others = getAllProjects().filter((p) => p.slug !== featured.slug);
-const featuredPreview = getProjectPreviewUrl(featured);
+const featuredPreview = getPreviewHref(featured);
+const external = isPreviewExternal();
 const featuredServices = getProjectServices(featured);
 const featuredPrimary =
   featuredServices.find((s) => s.isPrimaryPreview) ?? featuredServices[0];
@@ -32,7 +33,13 @@ const rows = getAllDeployRows();
         <span class="live-dot"><i></i> LIVE DEMO</span>
         <span class="host">Deploy host · <b>{DEPLOY_HOST}</b></span>
       </div>
-      <div class="hint">点击「预览项目」在新标签打开服务器部署实例</div>
+      <div class="hint">
+        {
+          external
+            ? '点击「预览项目」在新标签打开服务器部署实例'
+            : '点击「预览项目」进入站内 iframe 内嵌预览'
+        }
+      </div>
     </div>
 
     <div class="filters" role="toolbar" aria-label="项目筛选" data-project-filters>
@@ -74,8 +81,8 @@ const rows = getAllDeployRows();
           <a
             class="btn btn-preview"
             href={featuredPreview}
-            target="_blank"
-            rel="noopener noreferrer"
+            target={external ? '_blank' : undefined}
+            rel={external ? 'noopener noreferrer' : undefined}
           >
             预览项目
           </a>

@@ -3,6 +3,8 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import {
   getAllProjects,
   getProjectBySlug,
+  getPreviewHref,
+  isPreviewExternal,
   getProjectPreviewUrl,
   getProjectServices,
   buildDeployUrl,
@@ -19,7 +21,9 @@ const { slug } = Astro.params;
 const project = getProjectBySlug(slug!);
 if (!project) throw new Error(`Project not found: ${slug}`);
 
-const preview = getProjectPreviewUrl(project);
+const previewHref = getPreviewHref(project);
+const external = isPreviewExternal();
+const liveUrl = getProjectPreviewUrl(project);
 const services = getProjectServices(project);
 const relatedNotes = project.relatedNoteSlugs
   .map((s) => getNoteBySlug(s))
@@ -48,9 +52,9 @@ const toneBtn =
         <div class="actions">
           <a
             class:list={['btn', 'btn-preview', toneBtn]}
-            href={preview}
-            target="_blank"
-            rel="noopener noreferrer"
+            href={previewHref}
+            target={external ? '_blank' : undefined}
+            rel={external ? 'noopener noreferrer' : undefined}
           >
             <span class="play" aria-hidden="true">▶</span> 预览项目
           </a>
@@ -75,8 +79,10 @@ const toneBtn =
       <aside class="deploy-panel" aria-label="在线部署与预览">
         <div class:list={['head', project.coverTone]}>
           <div class="k">ONLINE DEPLOYMENT</div>
-          <h2 class="serif">在线预览入口</h2>
-          <p>服务器 IP · {DEPLOY_HOST} · 新标签打开</p>
+          <h2 class="serif">{external ? '在线预览入口' : '站内预览'}</h2>
+          <p>
+            服务器 IP · {DEPLOY_HOST} · {external ? '新标签打开' : '本站内嵌打开'}
+          </p>
         </div>
         <div class="body">
           <div class="svc">
@@ -87,9 +93,15 @@ const toneBtn =
                     <span class="name">{s.name}</span>
                     <span class="port">:{s.port}</span>
                   </div>
-                  <a href={buildDeployUrl(s.port, s.path)} target="_blank" rel="noopener noreferrer">
-                    {buildDeployUrl(s.port, s.path)}
-                  </a>
+                  {
+                    external ? (
+                      <a href={buildDeployUrl(s.port, s.path)} target="_blank" rel="noopener noreferrer">
+                        {buildDeployUrl(s.port, s.path)}
+                      </a>
+                    ) : (
+                      <span class="svc-url">{buildDeployUrl(s.port, s.path)}</span>
+                    )
+                  }
                 </div>
               ))
             }
@@ -97,12 +109,20 @@ const toneBtn =
           <div class="deploy-cta">
             <a
               class:list={['btn', 'btn-preview', toneBtn]}
-              href={preview}
-              target="_blank"
-              rel="noopener noreferrer"
+              href={previewHref}
+              target={external ? '_blank' : undefined}
+              rel={external ? 'noopener noreferrer' : undefined}
             >
-              <span class="play" aria-hidden="true">▶</span> 预览项目
+              <span class="play" aria-hidden="true">▶</span>
+              {external ? '预览项目' : '打开站内预览'}
             </a>
+            {
+              !external && (
+                <a class="btn btn-light" href={liveUrl} target="_blank" rel="noopener noreferrer" style="width:100%;margin-top:8px">
+                  新标签打开
+                </a>
+              )
+            }
           </div>
         </div>
       </aside>
@@ -111,13 +131,19 @@ const toneBtn =
     <div class="preview-band">
       <div>
         <h3 class="serif">想直接看线上效果？</h3>
-        <p>主按钮将在新标签打开服务器部署实例。</p>
+        <p>
+          {
+            external
+              ? '主按钮将在新标签打开服务器部署实例。'
+              : '进入站内预览页，以 iframe 内嵌部署实例（不新开窗口）。'
+          }
+        </p>
       </div>
       <a
         class:list={['btn', 'btn-preview', toneBtn]}
-        href={preview}
-        target="_blank"
-        rel="noopener noreferrer"
+        href={previewHref}
+        target={external ? '_blank' : undefined}
+        rel={external ? 'noopener noreferrer' : undefined}
       >
         <span class="play" aria-hidden="true">▶</span> 预览项目
       </a>
@@ -305,7 +331,8 @@ const toneBtn =
     border-radius: 999px;
     padding: 3px 8px;
   }
-  .svc-item a {
+  .svc-item a,
+  .svc-url {
     display: block;
     font-family: var(--font-mono);
     font-size: 12px;

@@ -1,4 +1,10 @@
-import { getPrimaryPreviewUrl, getProjectDeploy, buildDeployUrl } from './deploy';
+import {
+  getPrimaryPreviewUrl,
+  getProjectDeploy,
+  buildDeployUrl,
+  useInSitePreview,
+} from './deploy';
+import { path } from '../lib/paths';
 
 export type Project = {
   slug: string;
@@ -137,6 +143,7 @@ export function filterProjects(
   return projects.filter((p) => p.filters.includes(filter));
 }
 
+/** 演示站真实 URL（始终指向服务器部署实例） */
 export function getProjectPreviewUrl(project: Project): string {
   return (
     getPrimaryPreviewUrl(project.projectKey) ??
@@ -144,8 +151,28 @@ export function getProjectPreviewUrl(project: Project): string {
   );
 }
 
+/** 站内 iframe 预览页路径 */
+export function getInSitePreviewPath(project: Project): string {
+  return path(`/projects/${project.slug}/preview`);
+}
+
+/**
+ * 「预览项目」按钮最终 href
+ * - server 构建：站内 /projects/:slug/preview
+ * - github / 默认：直接外链演示站
+ */
+export function getPreviewHref(project: Project): string {
+  if (useInSitePreview()) return getInSitePreviewPath(project);
+  return getProjectPreviewUrl(project);
+}
+
+/** 是否应在新标签打开（外链时 true；站内预览 false） */
+export function isPreviewExternal(): boolean {
+  return !useInSitePreview();
+}
+
 export function getProjectServices(project: Project) {
   return getProjectDeploy(project.projectKey)?.services ?? [];
 }
 
-export { buildDeployUrl };
+export { buildDeployUrl, useInSitePreview };
