@@ -15,8 +15,10 @@
 | `01-home.png` | 首页 |
 | `02-notes.png` | 笔记列表 |
 | `03-note-detail.png` | 笔记详情 |
-| `04-projects.png` | 项目列表 |
-| `05-project-detail.png` | 项目详情 |
+| `04-projects.png` | 项目列表（含预览按钮 + 端口表） |
+| `05-project-detail.png` | 项目详情 · Code Review Agent（预览 :18001） |
+| `05b-project-detail-smartqa.png` | 项目详情 · SmartQA（预览 :18080） |
+| `05c-project-detail-xhagentos.png` | 项目详情 · XHAgentOS（预览 :18082） |
 | `06-about.png` | 关于 |
 
 ## 可交互 HTML 源稿

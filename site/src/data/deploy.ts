@@ -1,0 +1,81 @@
+/** Live deployment map for project demos (source of truth). */
+
+export const DEPLOY_HOST = '1.14.106.17';
+
+export type DeployService = {
+  name: string;
+  port: number;
+  path: string;
+  /** Primary preview target for this service */
+  isPrimaryPreview?: boolean;
+};
+
+export type ProjectDeploy = {
+  projectKey: 'code-review-agent' | 'smartqa' | 'xhagentos';
+  services: DeployService[];
+};
+
+export const PROJECT_DEPLOYS: ProjectDeploy[] = [
+  {
+    projectKey: 'smartqa',
+    services: [
+      { name: '前端', port: 18080, path: '/', isPrimaryPreview: true },
+      { name: '后端 API', port: 18000, path: '/api/health' },
+    ],
+  },
+  {
+    projectKey: 'code-review-agent',
+    services: [
+      { name: 'API', port: 18001, path: '/api/health', isPrimaryPreview: true },
+    ],
+  },
+  {
+    projectKey: 'xhagentos',
+    services: [
+      { name: '前端', port: 18082, path: '/', isPrimaryPreview: true },
+      { name: '后端', port: 18002, path: '/' },
+    ],
+  },
+];
+
+export function buildDeployUrl(port: number, path = '/'): string {
+  const normalized = path.startsWith('/') ? path : `/${path}`;
+  return `http://${DEPLOY_HOST}:${port}${normalized === '/' ? '/' : normalized}`;
+}
+
+export function getProjectDeploy(projectKey: string): ProjectDeploy | undefined {
+  return PROJECT_DEPLOYS.find((p) => p.projectKey === projectKey);
+}
+
+/** Primary "预览项目" URL for a project slug/key. */
+export function getPrimaryPreviewUrl(projectKey: string): string | undefined {
+  const deploy = getProjectDeploy(projectKey);
+  if (!deploy) return undefined;
+  const primary =
+    deploy.services.find((s) => s.isPrimaryPreview) ?? deploy.services[0];
+  if (!primary) return undefined;
+  return buildDeployUrl(primary.port, primary.path);
+}
+
+export function getAllDeployRows(): Array<{
+  project: string;
+  service: string;
+  port: number;
+  url: string;
+  projectKey: string;
+}> {
+  const labels: Record<string, string> = {
+    smartqa: 'SmartQA（智能问数）',
+    'code-review-agent': 'Code Review Agent',
+    xhagentos: 'XHAgentOS',
+  };
+  return PROJECT_DEPLOYS.flatMap((p) =>
+    p.services.map((s) => ({
+      project: labels[p.projectKey] ?? p.projectKey,
+      service: s.name,
+      port: s.port,
+      url: buildDeployUrl(s.port, s.path),
+      projectKey: p.projectKey,
+    })),
+  );
+}

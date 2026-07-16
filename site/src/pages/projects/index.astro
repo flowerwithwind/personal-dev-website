@@ -1,0 +1,389 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ProjectCard from '../../components/ProjectCard.astro';
+import {
+  getFeaturedProject,
+  getAllProjects,
+  getProjectPreviewUrl,
+  getProjectServices,
+  buildDeployUrl,
+} from '../../data/projects';
+import { getAllDeployRows, DEPLOY_HOST } from '../../data/deploy';
+import { path } from '../../lib/paths';
+
+const featured = getFeaturedProject()!;
+const others = getAllProjects().filter((p) => p.slug !== featured.slug);
+const featuredPreview = getProjectPreviewUrl(featured);
+const featuredServices = getProjectServices(featured);
+const featuredPrimary =
+  featuredServices.find((s) => s.isPrimaryPreview) ?? featuredServices[0];
+const rows = getAllDeployRows();
+---
+
+<BaseLayout current="projects" title="项目" description="可运行、已部署的系统与实验">
+  <main class="container page">
+    <header class="page-hero">
+      <h1 class="serif">项目与实验</h1>
+      <p>可运行、已部署的系统。列表可直接预览线上实例；详情页提供完整部署入口与健康检查地址。</p>
+    </header>
+
+    <div class="deploy-banner">
+      <div class="left">
+        <span class="live-dot"><i></i> LIVE DEMO</span>
+        <span class="host">Deploy host · <b>{DEPLOY_HOST}</b></span>
+      </div>
+      <div class="hint">点击「预览项目」访问服务器部署实例（新标签打开）</div>
+    </div>
+
+    <div class="filters" role="toolbar" aria-label="项目筛选" data-project-filters>
+      <button type="button" class="chip is-active" data-filter="all">全部</button>
+      <button type="button" class="chip" data-filter="agent">AI Agent</button>
+      <button type="button" class="chip" data-filter="data">数据智能</button>
+      <button type="button" class="chip" data-filter="fullstack">全栈平台</button>
+      <button type="button" class="chip" data-filter="live">已上线</button>
+    </div>
+
+    <article class="featured" data-project-card data-filters={featured.filters.join(' ')}>
+      <div class:list={['featured-visual', featured.coverTone]}>
+        <div>
+          <div class="label">FEATURED · AI AGENT</div>
+          <div class="big">{featured.title.replace(' ', '\n')}</div>
+        </div>
+        {
+          featuredPrimary && (
+            <div class="ports">
+              API :{featuredPrimary.port}
+              <br />
+              {featuredPrimary.path}
+            </div>
+          )
+        }
+      </div>
+      <div class="featured-body">
+        <div class="cat">
+          <span class="live-dot"><i></i> Online</span>
+          {featured.tags.slice(0, 3).map((t) => <span class="tag tag-accent">{t}</span>)}
+          <span class="tag">{featured.year}</span>
+        </div>
+        <h2 class="serif">{featured.title}</h2>
+        <p class="desc">{featured.summary}</p>
+        <div class="tags">
+          {featured.tags.map((t) => <span class="tag">{t}</span>)}
+        </div>
+        <div class="actions">
+          <a
+            class="btn btn-preview"
+            href={featuredPreview}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            预览项目
+          </a>
+          <a class="btn btn-light" href={path(`/projects/${featured.slug}`)}>查看详情</a>
+          {
+            featured.github && (
+              <a class="btn btn-soft" href={featured.github} target="_blank" rel="noopener noreferrer">
+                GitHub
+              </a>
+            )
+          }
+        </div>
+      </div>
+    </article>
+
+    <div class="grid" data-project-grid>
+      {
+        others.map((p) => (
+          <div data-project-card data-filters={p.filters.join(' ')}>
+            <ProjectCard project={p} />
+          </div>
+        ))
+      }
+    </div>
+
+    <section class="matrix" aria-label="部署端口一览">
+      <div class="matrix-head">
+        <h3 class="serif">部署端口一览</h3>
+        <span>IP = {DEPLOY_HOST}</span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>项目</th>
+              <th>服务</th>
+              <th>端口</th>
+              <th>访问示例</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              rows.map((row) => (
+                <tr>
+                  <td>{row.project}</td>
+                  <td>{row.service}</td>
+                  <td>
+                    <code>{row.port}</code>
+                  </td>
+                  <td>
+                    <a href={row.url} target="_blank" rel="noopener noreferrer">
+                      {row.url}
+                    </a>
+                  </td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+</BaseLayout>
+
+<style>
+  .page {
+    padding-bottom: 48px;
+  }
+  .page-hero {
+    padding: 44px 0 20px;
+  }
+  .page-hero h1 {
+    font-size: 44px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    margin: 0 0 10px;
+  }
+  .page-hero p {
+    margin: 0;
+    color: var(--muted);
+    font-weight: 500;
+    max-width: 620px;
+  }
+  .deploy-banner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px 20px;
+    margin-bottom: 22px;
+    padding: 14px 18px;
+    border-radius: 16px;
+    background:
+      radial-gradient(420px 120px at 0% 50%, rgba(91, 77, 255, 0.12), transparent 60%),
+      rgba(255, 255, 255, 0.88);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    box-shadow: var(--shadow-sm);
+  }
+  .left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .host {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ink-soft);
+  }
+  .host b {
+    color: var(--accent);
+  }
+  .hint {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--muted);
+  }
+  .filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+  .featured {
+    display: grid;
+    grid-template-columns: 1.05fr 1.2fr;
+    gap: 0;
+    margin-bottom: 16px;
+    border-radius: 24px;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.92);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    box-shadow: var(--shadow);
+  }
+  .featured-visual {
+    min-height: 280px;
+    padding: 28px;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  .featured-visual.violet {
+    background:
+      radial-gradient(circle at 25% 25%, rgba(255, 255, 255, 0.22), transparent 42%),
+      linear-gradient(145deg, #7c6fff 0%, #5b4dff 48%, #3730a3 100%);
+  }
+  .label {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    opacity: 0.9;
+  }
+  .big {
+    font-family: var(--font-serif);
+    font-size: 36px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    margin-top: 18px;
+    white-space: pre-line;
+  }
+  .ports {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    opacity: 0.88;
+    line-height: 1.7;
+  }
+  .featured-body {
+    padding: 28px 28px 24px;
+    display: flex;
+    flex-direction: column;
+  }
+  .cat {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+  }
+  .featured-body h2 {
+    font-size: 28px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    margin: 0 0 10px;
+  }
+  .desc {
+    color: var(--ink-soft);
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 1.7;
+    margin: 0 0 16px;
+    flex: 1;
+  }
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 18px;
+  }
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+  .matrix {
+    margin-bottom: 40px;
+    border-radius: 20px;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    box-shadow: var(--shadow-sm);
+  }
+  .matrix-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--line);
+  }
+  .matrix-head h3 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 600;
+  }
+  .matrix-head span {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--muted);
+  }
+  .table-wrap {
+    overflow-x: auto;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13.5px;
+  }
+  th,
+  td {
+    padding: 12px 16px;
+    text-align: left;
+    border-bottom: 1px solid var(--line);
+  }
+  th {
+    background: rgba(12, 11, 16, 0.03);
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--muted);
+  }
+  td {
+    font-weight: 500;
+    color: var(--ink-soft);
+  }
+  td:first-child {
+    color: var(--ink);
+    font-weight: 700;
+  }
+  code {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    background: rgba(91, 77, 255, 0.08);
+    color: var(--accent);
+    padding: 2px 7px;
+    border-radius: 6px;
+  }
+  td a {
+    color: var(--accent);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 500;
+    word-break: break-all;
+  }
+  tr:last-child td {
+    border-bottom: 0;
+  }
+  @media (max-width: 900px) {
+    .featured,
+    .grid {
+      grid-template-columns: 1fr;
+    }
+    .featured-visual {
+      min-height: 200px;
+    }
+  }
+</style>
+
+<script>
+  const toolbar = document.querySelector('[data-project-filters]');
+  if (toolbar) {
+    toolbar.addEventListener('click', (e) => {
+      const btn = (e.target as HTMLElement).closest<HTMLButtonElement>('[data-filter]');
+      if (!btn) return;
+      toolbar.querySelectorAll('.chip').forEach((c) => c.classList.remove('is-active'));
+      btn.classList.add('is-active');
+      const key = btn.dataset.filter || 'all';
+      document.querySelectorAll<HTMLElement>('[data-project-card]').forEach((card) => {
+        const filters = (card.dataset.filters || '').split(/\s+/);
+        const show = key === 'all' || filters.includes(key);
+        card.style.display = show ? '' : 'none';
+      });
+    });
+  }
+</script>

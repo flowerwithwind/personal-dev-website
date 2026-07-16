@@ -1,0 +1,161 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getAllNotes, getNoteBySlug } from '../../data/notes';
+import { getProjectBySlug } from '../../data/projects';
+import { renderMarkdown } from '../../lib/markdown';
+import { formatDate } from '../../lib/format';
+import { path } from '../../lib/paths';
+
+export function getStaticPaths() {
+  return getAllNotes().map((n) => ({ params: { slug: n.slug } }));
+}
+
+const { slug } = Astro.params;
+const note = getNoteBySlug(slug!);
+if (!note) {
+  throw new Error(`Note not found: ${slug}`);
+}
+const html = renderMarkdown(note.body);
+const relatedNotes = note.relatedNoteSlugs
+  .map((s) => getNoteBySlug(s))
+  .filter(Boolean);
+const relatedProjects = note.relatedProjectSlugs
+  .map((s) => getProjectBySlug(s))
+  .filter(Boolean);
+---
+
+<BaseLayout current="notes" title={note.title} description={note.summary}>
+  <div class="container">
+    <div class="crumb">
+      <a href={path('/notes')}>笔记</a>
+      <span>/</span>
+      <span>{note.categoryLabel}</span>
+    </div>
+  </div>
+
+  <article class="article-wrap">
+    <div class="article-card">
+      <div class="cat">{note.categoryLabel}</div>
+      <h1 class="serif">{note.title}</h1>
+      <div class="meta">
+        <span>{formatDate(note.publishedAt)}</span>
+        <span>约 {note.readingMinutes} 分钟</span>
+        <span>状态：{note.status === 'growing' ? '生长中' : '已发布'}</span>
+      </div>
+      <div class="prose" set:html={html} />
+    </div>
+
+    <div class="related">
+      {
+        relatedProjects.map((p) =>
+          p ? (
+            <a href={path(`/projects/${p.slug}`)}>
+              <strong>关联项目</strong>
+              <span>{p.title} →</span>
+            </a>
+          ) : null,
+        )
+      }
+      {
+        relatedNotes.map((n) =>
+          n ? (
+            <a href={path(`/notes/${n.slug}`)}>
+              <strong>相关笔记</strong>
+              <span>{n.title} →</span>
+            </a>
+          ) : null,
+        )
+      }
+      {
+        relatedProjects.length === 0 && relatedNotes.length === 0 && (
+          <a href={path('/notes')}>
+            <strong>更多</strong>
+            <span>返回笔记列表 →</span>
+          </a>
+        )
+      }
+    </div>
+  </article>
+</BaseLayout>
+
+<style>
+  .crumb {
+    padding: 28px 0 8px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--muted);
+    display: flex;
+    gap: 8px;
+  }
+  .crumb a {
+    color: var(--accent);
+  }
+  .article-wrap {
+    max-width: 740px;
+    margin: 0 auto;
+    padding: 12px 24px 48px;
+  }
+  .article-card {
+    background: rgba(255, 255, 255, 0.92);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    border-radius: 24px;
+    box-shadow: var(--shadow);
+    padding: 36px 40px 40px;
+    backdrop-filter: blur(10px);
+  }
+  .cat {
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 12px;
+  }
+  h1 {
+    font-size: clamp(28px, 4vw, 34px);
+    font-weight: 600;
+    line-height: 1.28;
+    letter-spacing: -0.02em;
+    margin: 0 0 14px;
+  }
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 18px;
+    color: rgba(12, 11, 16, 0.42);
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 28px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--line);
+  }
+  .related {
+    margin-top: 28px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .related a {
+    display: block;
+    padding: 14px 16px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.75);
+    border: 1px solid var(--line);
+  }
+  .related strong {
+    display: block;
+    font-size: 12px;
+    color: var(--accent);
+    margin-bottom: 6px;
+  }
+  .related span {
+    font-size: 14px;
+    font-weight: 600;
+  }
+  @media (max-width: 640px) {
+    .article-card {
+      padding: 24px 18px 28px;
+    }
+    .related {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

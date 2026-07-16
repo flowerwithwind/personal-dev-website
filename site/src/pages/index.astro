@@ -1,0 +1,372 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import NoteCard from '../components/NoteCard.astro';
+import { siteConfig, nowItems, nowLabels } from '../data/site';
+import { getFeaturedNotes } from '../data/notes';
+import { getAllProjects, getProjectPreviewUrl } from '../data/projects';
+import { path } from '../lib/paths';
+
+const latestNotes = getFeaturedNotes(3);
+const [featuredNote, ...restNotes] = latestNotes;
+const projectCards = getAllProjects();
+---
+
+<BaseLayout current="home" title={siteConfig.title}>
+  <section class="hero container">
+    <div class="kicker"><i></i> 个人网站 · 公开思考与构建记录</div>
+    <h1 class="serif">
+      写一点笔记，
+      <span class="soft">做一些能跑起来的东西</span>
+    </h1>
+    <p class="lead">
+      这里是我的个人主页：分享 Agent / RAG / 全栈实践，也存放仍在生长的笔记与想法。求职只是用途之一。
+    </p>
+    <div class="cta">
+      <a class="btn btn-dark" href={path('/notes')}>阅读笔记</a>
+      <a class="btn btn-light" href={path('/projects')}>查看项目</a>
+    </div>
+    <div class="hero-tags">
+      <span>Digital Garden</span>
+      <span>AI Systems</span>
+      <span>Open Source</span>
+      <span>Learning in public</span>
+    </div>
+  </section>
+
+  <section class="now container" aria-label="Now">
+    <h2 class="serif">Now</h2>
+    <div class="now-grid">
+      {
+        nowItems.map((item) => (
+          <div class="now-item">
+            <b>{nowLabels[item.kind]}</b>
+            <span>{item.text}</span>
+          </div>
+        ))
+      }
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <h2>最新笔记</h2>
+          <p>随写随改。完整长文与碎片札记都会出现在这里。</p>
+        </div>
+        <a class="more" href={path('/notes')}>全部笔记 →</a>
+      </div>
+      <div class="notes-grid">
+        {featuredNote && <NoteCard note={featuredNote} large />}
+        {restNotes.map((n) => <NoteCard note={n} />)}
+      </div>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top: 8px;">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <h2>项目与实验</h2>
+          <p>开源与可演示系统，是笔记背后的实践证据。</p>
+        </div>
+        <a class="more" href={path('/projects')}>全部项目 →</a>
+      </div>
+      <div class="projects-grid">
+        {
+          projectCards.map((p) => (
+            <a class:list={['mini-project', p.coverTone]} href={path(`/projects/${p.slug}`)}>
+              <div class="thumb">{p.shortTitle}</div>
+              <div class="body">
+                <h3>{p.title}</h3>
+                <p>{p.summary}</p>
+                <div class="tags">
+                  {p.tags.slice(0, 3).map((t) => (
+                    <span class="tag">{t}</span>
+                  ))}
+                </div>
+                <div class="mini-actions">
+                  <span class="preview-hint">可预览 · 详情内打开</span>
+                  <span class="go">查看 →</span>
+                </div>
+              </div>
+            </a>
+          ))
+        }
+      </div>
+      <!-- progressive: also expose preview links for crawlers / no-JS users via list page -->
+      <p class="sr-only">
+        {
+          projectCards.map((p) => (
+            <a href={getProjectPreviewUrl(p)} target="_blank" rel="noopener noreferrer">
+              预览项目 {p.title}
+            </a>
+          ))
+        }
+      </p>
+    </div>
+  </section>
+
+  <section class="band container">
+    <div>
+      <h2 class="serif">这个站点为谁而建？</h2>
+      <p>
+        首先是给自己：记录构建与思考。其次是给同行：交流笔记与项目。如果它也帮你了解我是否匹配某个岗位，那是额外的好事。
+      </p>
+      <div class="btns">
+        <a class="btn band-light" href={path('/about')}>关于我</a>
+        <a class="btn band-ghost" href={path('/rss.xml')}>RSS</a>
+      </div>
+    </div>
+    <div class="band-side">
+      <div><strong>笔记</strong><span>公开写作 · 可持续更新</span></div>
+      <div><strong>项目</strong><span>可运行的系统与实验</span></div>
+      <div><strong>关于</strong><span>经历、兴趣与联系方式</span></div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .hero {
+    padding: 72px 0 36px;
+    text-align: center;
+    position: relative;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 8%;
+    transform: translateX(-50%);
+    width: min(720px, 90%);
+    height: 280px;
+    background: radial-gradient(closest-side, rgba(255, 255, 255, 0.55), transparent 72%);
+    pointer-events: none;
+    z-index: 0;
+  }
+  .hero > * {
+    position: relative;
+    z-index: 1;
+  }
+  h1 {
+    font-size: clamp(40px, 5.2vw, 58px);
+    font-weight: 600;
+    line-height: 1.14;
+    letter-spacing: -0.02em;
+    margin: 18px auto 16px;
+    max-width: 820px;
+  }
+  h1 .soft {
+    display: block;
+    color: rgba(12, 11, 16, 0.72);
+  }
+  .lead {
+    max-width: 540px;
+    margin: 0 auto 26px;
+    color: var(--ink-soft);
+    font-size: 17px;
+    font-weight: 500;
+  }
+  .cta {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 22px;
+  }
+  .hero-tags {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .hero-tags span {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--muted);
+    background: rgba(255, 255, 255, 0.7);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 6px 11px;
+  }
+  .now {
+    margin: 8px auto 28px;
+    padding: 22px 24px;
+    display: grid;
+    grid-template-columns: 120px 1fr;
+    gap: 16px;
+    align-items: start;
+    background: rgba(255, 255, 255, 0.86);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+    backdrop-filter: blur(12px);
+  }
+  .now h2 {
+    font-size: 24px;
+    font-weight: 600;
+    margin: 0;
+  }
+  .now-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px 20px;
+  }
+  .now-item {
+    display: flex;
+    gap: 10px;
+    align-items: baseline;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--ink-soft);
+  }
+  .now-item b {
+    font-size: 11.5px;
+    font-weight: 700;
+    color: var(--accent);
+    background: var(--accent-soft);
+    border-radius: 999px;
+    padding: 3px 9px;
+  }
+  .notes-grid {
+    display: grid;
+    grid-template-columns: 1.25fr 1fr;
+    gap: 14px;
+  }
+  .projects-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+  }
+  .mini-project {
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.75);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+  .mini-project:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow);
+  }
+  .mini-project .thumb {
+    height: 112px;
+    display: grid;
+    place-items: center;
+    font-family: var(--font-serif);
+    font-weight: 700;
+    font-size: 22px;
+    color: #fff;
+  }
+  .mini-project.violet .thumb {
+    background: linear-gradient(135deg, #7c6fff, #4f46e5);
+  }
+  .mini-project.teal .thumb {
+    background: linear-gradient(135deg, #2dd4bf, #0f766e);
+  }
+  .mini-project.amber .thumb {
+    background: linear-gradient(135deg, #fbbf24, #ea580c);
+  }
+  .mini-project .body {
+    padding: 16px;
+  }
+  .mini-project h3 {
+    margin: 0 0 8px;
+    font-size: 16px;
+    font-weight: 700;
+  }
+  .mini-project p {
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 500;
+    min-height: 54px;
+    margin: 0 0 12px;
+  }
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 10px;
+  }
+  .mini-actions {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: rgba(12, 11, 16, 0.4);
+  }
+  .go {
+    color: var(--accent);
+  }
+  .band {
+    margin: 12px auto 28px;
+    border-radius: var(--radius-lg);
+    background:
+      radial-gradient(500px 200px at 10% 0%, rgba(124, 108, 255, 0.25), transparent 55%),
+      var(--band);
+    color: #f5f5f4;
+    padding: 32px;
+    display: grid;
+    grid-template-columns: 1.3fr 0.7fr;
+    gap: 20px;
+    align-items: center;
+    box-shadow: var(--shadow);
+  }
+  .band h2 {
+    font-size: 28px;
+    font-weight: 600;
+    margin: 0 0 10px;
+  }
+  .band p {
+    color: rgba(255, 255, 255, 0.62);
+    font-weight: 500;
+    margin: 0 0 18px;
+    max-width: 480px;
+  }
+  .btns {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .band-light {
+    background: #fff;
+    color: #14131a;
+  }
+  .band-ghost {
+    background: transparent;
+    color: #fff;
+    border-color: rgba(255, 255, 255, 0.18);
+  }
+  .band-side {
+    display: grid;
+    gap: 10px;
+  }
+  .band-side div {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 14px;
+    padding: 14px 16px;
+  }
+  .band-side strong {
+    display: block;
+    font-size: 13px;
+    margin-bottom: 4px;
+  }
+  .band-side span {
+    font-size: 12.5px;
+    color: rgba(255, 255, 255, 0.52);
+    font-weight: 500;
+  }
+  @media (max-width: 860px) {
+    .now,
+    .notes-grid,
+    .projects-grid,
+    .band {
+      grid-template-columns: 1fr;
+    }
+    .now-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

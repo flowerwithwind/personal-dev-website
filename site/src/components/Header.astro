@@ -1,0 +1,177 @@
+---
+import { path } from '../lib/paths';
+interface Props {
+  current?: 'home' | 'notes' | 'projects' | 'about';
+}
+const { current = 'home' } = Astro.props;
+const items = [
+  { id: 'home', href: path('/'), label: '首页' },
+  { id: 'notes', href: path('/notes'), label: '笔记' },
+  { id: 'projects', href: path('/projects'), label: '项目' },
+  { id: 'about', href: path('/about'), label: '关于' },
+] as const;
+---
+
+<header class="site-header" data-header>
+  <div class="header-inner container">
+    <a class="logo" href={path('/')}>
+      <span class="logo-mark" aria-hidden="true"></span>
+      <span>赵海蓺</span>
+    </a>
+
+    <nav class="nav desktop-nav" aria-label="主导航">
+      {
+        items.map((item) => (
+          <a href={item.href} class={current === item.id ? 'is-active' : undefined} aria-current={current === item.id ? 'page' : undefined}>
+            {item.label}
+          </a>
+        ))
+      }
+      <a class="btn btn-dark btn-sm nav-cta" href={path('/rss.xml')}>订阅</a>
+    </nav>
+
+    <button class="menu-toggle" type="button" aria-label="打开菜单" aria-expanded="false" data-menu-toggle>
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+
+  <nav class="mobile-nav" aria-label="移动导航" data-mobile-nav hidden>
+    {
+      items.map((item) => (
+        <a href={item.href} class={current === item.id ? 'is-active' : undefined}>
+          {item.label}
+        </a>
+      ))
+    }
+    <a href={path('/rss.xml')}>订阅 / RSS</a>
+  </nav>
+</header>
+
+<style>
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    backdrop-filter: blur(16px) saturate(1.2);
+    background: rgba(243, 241, 234, 0.72);
+    border-bottom: 1px solid transparent;
+  }
+  .site-header.is-solid {
+    border-bottom-color: var(--line);
+  }
+  .header-inner {
+    height: var(--header-h);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 700;
+    font-size: 17px;
+    letter-spacing: -0.02em;
+  }
+  .logo-mark {
+    width: 30px;
+    height: 30px;
+    border-radius: 10px;
+    background: linear-gradient(145deg, #8b7cff 0%, #5b4dff 55%, #14b8a6 120%);
+    box-shadow: 0 8px 18px rgba(91, 77, 255, 0.28);
+  }
+  .nav {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: var(--muted);
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .nav a {
+    padding: 8px 13px;
+    border-radius: 999px;
+  }
+  .nav a:hover {
+    color: var(--ink);
+    background: rgba(12, 11, 16, 0.04);
+  }
+  .nav a.is-active {
+    color: var(--ink);
+    background: rgba(12, 11, 16, 0.06);
+  }
+  .nav-cta {
+    margin-left: 8px;
+  }
+  .menu-toggle {
+    display: none;
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    border: 1px solid var(--line);
+    background: rgba(255, 255, 255, 0.8);
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    cursor: pointer;
+  }
+  .menu-toggle span {
+    display: block;
+    width: 16px;
+    height: 2px;
+    background: var(--ink);
+    border-radius: 2px;
+  }
+  .mobile-nav {
+    display: none;
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px 24px 20px;
+    border-bottom: 1px solid var(--line);
+    background: rgba(243, 241, 234, 0.96);
+  }
+  .mobile-nav a {
+    padding: 12px 14px;
+    border-radius: 12px;
+    border: 1px solid var(--line);
+    background: rgba(255, 255, 255, 0.8);
+    font-weight: 600;
+    color: var(--ink-soft);
+  }
+  .mobile-nav a.is-active {
+    color: var(--accent);
+    border-color: rgba(91, 77, 255, 0.28);
+    background: var(--accent-soft);
+  }
+  .mobile-nav.is-open {
+    display: flex;
+  }
+  @media (max-width: 860px) {
+    .desktop-nav {
+      display: none;
+    }
+    .menu-toggle {
+      display: flex;
+    }
+  }
+</style>
+
+<script>
+  const header = document.querySelector('[data-header]');
+  const toggle = document.querySelector('[data-menu-toggle]');
+  const mobile = document.querySelector('[data-mobile-nav]');
+
+  const onScroll = () => {
+    header?.classList.toggle('is-solid', window.scrollY > 8);
+  };
+  onScroll();
+  window.addEventListener('scroll', onScroll, { passive: true });
+
+  toggle?.addEventListener('click', () => {
+    const open = mobile?.classList.toggle('is-open');
+    if (mobile) mobile.hidden = !open;
+    toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
+</script>

@@ -1,0 +1,84 @@
+---
+import type { Note } from '../data/notes';
+import { formatDate } from '../lib/format';
+import { path } from '../lib/paths';
+
+interface Props {
+  note: Note;
+  large?: boolean;
+}
+const { note, large = false } = Astro.props;
+---
+
+<a class:list={['note-card', { large }]} href={path(`/notes/${note.slug}`)}>
+  <div class="cat">{note.categoryLabel}</div>
+  <h3>{note.title}</h3>
+  <p>{note.summary}</p>
+  <div class="meta">
+    <span>{formatDate(note.publishedAt)}</span>
+    <span>
+      {note.status === 'growing' ? '持续更新' : `约 ${note.readingMinutes} 分钟`}
+    </span>
+  </div>
+</a>
+
+<style>
+  .note-card {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    min-height: 168px;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.75);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+  .note-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow);
+  }
+  .note-card.large {
+    grid-row: span 2;
+    min-height: 100%;
+    background:
+      radial-gradient(480px 220px at 100% 0%, rgba(91, 77, 255, 0.1), transparent 60%),
+      rgba(255, 255, 255, 0.92);
+  }
+  .cat {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 10px;
+  }
+  h3 {
+    font-family: var(--font-serif);
+    font-size: 20px;
+    font-weight: 600;
+    line-height: 1.35;
+    letter-spacing: -0.015em;
+    margin: 0 0 10px;
+  }
+  .large h3 {
+    font-size: 26px;
+  }
+  p {
+    color: var(--muted);
+    font-size: 14px;
+    font-weight: 500;
+    flex: 1;
+    margin: 0 0 14px;
+  }
+  .meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    font-weight: 600;
+    color: rgba(12, 11, 16, 0.38);
+  }
+  @media (max-width: 860px) {
+    .note-card.large {
+      grid-row: auto;
+    }
+  }
+</style>

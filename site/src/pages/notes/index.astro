@@ -1,0 +1,148 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getAllNotes, getNoteFilterChips } from '../../data/notes';
+import { formatDate } from '../../lib/format';
+import { path } from '../../lib/paths';
+
+const notes = getAllNotes();
+const chips = getNoteFilterChips();
+---
+
+<BaseLayout current="notes" title="笔记" description="公开的思考与实验记录 · Digital Garden">
+  <div class="container page">
+    <header class="page-hero">
+      <h1 class="serif">笔记</h1>
+      <p>
+        公开的思考与实验记录。有些是完整文章，有些仍会继续修改——更接近 digital garden，而不是新闻博客。
+      </p>
+    </header>
+
+    <div class="filters" role="toolbar" aria-label="笔记筛选" data-note-filters>
+      {
+        chips.map((chip, i) => (
+          <button type="button" class:list={['chip', { 'is-active': i === 0 }]} data-filter={chip}>
+            {chip}
+          </button>
+        ))
+      }
+    </div>
+
+    <div class="list" data-note-list>
+      {
+        notes.map((note) => (
+          <a
+            class="item"
+            href={path(`/notes/${note.slug}`)}
+            data-tags={[...note.filters, ...note.tags, note.categoryLabel].join('|')}
+          >
+            <div>
+              <div class:list={['cat', { seed: note.status === 'growing' }]}>{note.categoryLabel}</div>
+              <h2 class="serif">{note.title}</h2>
+              <p>{note.summary}</p>
+            </div>
+            <div class="date">{note.status === 'growing' ? '持续更新' : formatDate(note.publishedAt)}</div>
+          </a>
+        ))
+      }
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .page {
+    padding-bottom: 56px;
+  }
+  .page-hero {
+    padding: 48px 0 18px;
+  }
+  .page-hero h1 {
+    font-size: 44px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    margin: 0 0 10px;
+  }
+  .page-hero p {
+    margin: 0;
+    color: var(--muted);
+    font-weight: 500;
+    max-width: 560px;
+  }
+  .filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 8px 0 22px;
+  }
+  .list {
+    display: grid;
+    gap: 12px;
+    max-width: 900px;
+  }
+  .item {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 16px;
+    padding: 18px 20px;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.75);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+  .item:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow);
+  }
+  .cat {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 6px;
+  }
+  .cat.seed {
+    color: #b45309;
+  }
+  h2 {
+    font-size: 20px;
+    font-weight: 600;
+    letter-spacing: -0.015em;
+    margin: 0 0 8px;
+  }
+  p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 14px;
+    font-weight: 500;
+  }
+  .date {
+    font-size: 12px;
+    font-weight: 600;
+    color: rgba(12, 11, 16, 0.4);
+    white-space: nowrap;
+    padding-top: 2px;
+  }
+  @media (max-width: 640px) {
+    .item {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<script>
+  const toolbar = document.querySelector('[data-note-filters]');
+  const list = document.querySelector('[data-note-list]');
+  if (toolbar && list) {
+    toolbar.addEventListener('click', (e) => {
+      const btn = (e.target as HTMLElement).closest<HTMLButtonElement>('[data-filter]');
+      if (!btn) return;
+      toolbar.querySelectorAll('.chip').forEach((c) => c.classList.remove('is-active'));
+      btn.classList.add('is-active');
+      const key = btn.dataset.filter || '全部';
+      list.querySelectorAll<HTMLElement>('.item').forEach((item) => {
+        const tags = item.dataset.tags || '';
+        const show = key === '全部' || tags.split('|').some((t) => t.includes(key) || key.includes(t));
+        item.style.display = show ? '' : 'none';
+      });
+    });
+  }
+</script>

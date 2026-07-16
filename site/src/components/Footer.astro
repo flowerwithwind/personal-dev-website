@@ -1,0 +1,97 @@
+---
+import { siteConfig } from '../data/site';
+import { path } from '../lib/paths';
+---
+
+<footer class="site-footer">
+  <div class="footer-inner container">
+    <div>
+      <a class="logo" href={path('/')}>
+        <span class="logo-mark" aria-hidden="true"></span>
+        <span>{siteConfig.name}</span>
+      </a>
+      <p>个人数字主页 · 笔记、项目与构建记录</p>
+    </div>
+    <div class="footer-cols">
+      <div class="footer-col">
+        <h4>导航</h4>
+        <a href={path('/notes')}>笔记</a>
+        <a href={path('/projects')}>项目</a>
+        <a href={path('/about')}>关于</a>
+      </div>
+      <div class="footer-col">
+        <h4>连接</h4>
+        <a href={siteConfig.github} target="_blank" rel="noopener noreferrer">GitHub</a>
+        <a href={`mailto:${siteConfig.email}`}>Email</a>
+        <a href={path('/rss.xml')}>RSS</a>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom container">
+    <span>© {new Date().getFullYear()} {siteConfig.nameEn}. Personal Soft.</span>
+    <span>Built with Astro</span>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    margin-top: 20px;
+    padding: 36px 0 28px;
+    border-top: 1px solid var(--line);
+    background: linear-gradient(180deg, transparent, rgba(255, 255, 255, 0.35));
+  }
+  .footer-inner {
+    display: flex;
+    justify-content: space-between;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+  .logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 700;
+  }
+  .logo-mark {
+    width: 28px;
+    height: 28px;
+    border-radius: 9px;
+    background: linear-gradient(145deg, #8b7cff, #5b4dff 55%, #14b8a6);
+  }
+  .footer-inner p {
+    color: var(--muted);
+    font-size: 13.5px;
+    font-weight: 500;
+    margin: 8px 0 0;
+    max-width: 320px;
+  }
+  .footer-cols {
+    display: flex;
+    gap: 48px;
+  }
+  .footer-col h4 {
+    font-size: 13px;
+    margin: 0 0 10px;
+  }
+  .footer-col a {
+    display: block;
+    color: var(--muted);
+    font-size: 13.5px;
+    font-weight: 500;
+    margin-bottom: 8px;
+  }
+  .footer-col a:hover {
+    color: var(--accent);
+  }
+  .footer-bottom {
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid var(--line);
+    color: rgba(12, 11, 16, 0.4);
+    font-size: 12.5px;
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+</style>
