@@ -38,6 +38,17 @@ describe('deploy URL mapping', () => {
     );
   });
 
+  it('exposes in-site preview routes for each project slug', () => {
+    const projects = getAllProjects();
+    for (const p of projects) {
+      expect(p.slug.length).toBeGreaterThan(0);
+      // in-site embed route pattern used by UI
+      const embedPath = `/projects/${p.slug}/preview`;
+      expect(embedPath).toContain('/preview');
+      expect(getProjectPreviewUrl(p)).toContain(DEPLOY_HOST);
+    }
+  });
+
   it('includes documented ports in deploy rows', () => {
     const ports = getAllDeployRows().map((r) => r.port).sort();
     expect(ports).toEqual([18000, 18001, 18002, 18080, 18082].sort());

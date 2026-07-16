@@ -1,0 +1,299 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import {
+  getAllProjects,
+  getProjectBySlug,
+  getProjectPreviewUrl,
+  getProjectServices,
+  buildDeployUrl,
+} from '../../../data/projects';
+import { DEPLOY_HOST, getPrimaryService } from '../../../data/deploy';
+import { path } from '../../../lib/paths';
+
+export function getStaticPaths() {
+  return getAllProjects().map((p) => ({ params: { slug: p.slug } }));
+}
+
+const { slug } = Astro.params;
+const project = getProjectBySlug(slug!);
+if (!project) throw new Error(`Project not found: ${slug}`);
+
+const services = getProjectServices(project);
+const primary = getPrimaryService(project.projectKey);
+const defaultUrl = getProjectPreviewUrl(project);
+const tone =
+  project.coverTone === 'teal' ? 'teal' : project.coverTone === 'amber' ? 'amber' : 'violet';
+---
+
+<BaseLayout
+  current="projects"
+  title={`预览 · ${project.title}`}
+  description={`站内预览 ${project.title}`}
+>
+  <div class="preview-page" data-animate="fade-up">
+    <div class="toolbar container">
+      <div class="left">
+        <a class="back" href={path(`/projects/${project.slug}`)}>← 返回详情</a>
+        <div class="titles">
+          <h1 class="serif">{project.title}</h1>
+          <p class="sub">站内内嵌预览 · 部署于 {DEPLOY_HOST}</p>
+        </div>
+      </div>
+      <div class="right">
+        <label class="svc-label">
+          <span>服务</span>
+          <select id="preview-service" data-default-url={defaultUrl}>
+            {
+              services.map((s) => {
+                const url = buildDeployUrl(s.port, s.path);
+                const selected = primary && s.port === primary.port && s.path === primary.path;
+                return (
+                  <option value={url} selected={selected}>
+                    {s.name} · :{s.port}
+                  </option>
+                );
+              })
+            }
+          </select>
+        </label>
+        <a class="btn btn-light btn-sm" id="open-external" href={defaultUrl} target="_blank" rel="noopener noreferrer">
+          新标签打开
+        </a>
+        <button type="button" class="btn btn-soft btn-sm" id="reload-frame">刷新</button>
+      </div>
+    </div>
+
+    <div class="frame-shell container">
+      <div class="chrome">
+        <div class="dots" aria-hidden="true"><i></i><i></i><i></i></div>
+        <div class="addr" id="preview-addr">{defaultUrl}</div>
+        <span class:list={['badge', tone]}>LIVE</span>
+      </div>
+      <div class="frame-wrap">
+        <div class="loading" id="frame-loading">正在加载预览…</div>
+        <iframe
+          id="preview-frame"
+          title={`${project.title} 在线预览`}
+          src={defaultUrl}
+          loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade"
+          allow="clipboard-read; clipboard-write; fullscreen"
+        ></iframe>
+      </div>
+      <p class="note">
+        若预览区空白，可能是目标站点禁止被嵌入（X-Frame-Options / CSP）。可点「新标签打开」访问完整页面，或切换上方服务入口。
+      </p>
+    </div>
+  </div>
+</BaseLayout>
+
+<script is:inline>
+  (function () {
+    function boot() {
+      var select = document.getElementById('preview-service');
+      var frame = document.getElementById('preview-frame');
+      var addr = document.getElementById('preview-addr');
+      var openExt = document.getElementById('open-external');
+      var reload = document.getElementById('reload-frame');
+      var loading = document.getElementById('frame-loading');
+      if (!select || !frame || select.dataset.bound === '1') return;
+      select.dataset.bound = '1';
+
+      function setUrl(url) {
+        if (!url) return;
+        if (loading) loading.hidden = false;
+        frame.src = url;
+        if (addr) addr.textContent = url;
+        if (openExt) openExt.setAttribute('href', url);
+      }
+
+      select.addEventListener('change', function () {
+        setUrl(select.value);
+      });
+
+      if (reload) {
+        reload.addEventListener('click', function () {
+          setUrl(frame.src);
+        });
+      }
+
+      frame.addEventListener('load', function () {
+        if (loading) loading.hidden = true;
+      });
+      // hide spinner after a while even if load event is blocked cross-origin
+      setTimeout(function () {
+        if (loading) loading.hidden = true;
+      }, 2500);
+    }
+    boot();
+    document.addEventListener('astro:page-load', function () {
+      var select = document.getElementById('preview-service');
+      if (select) select.dataset.bound = '';
+      boot();
+    });
+  })();
+</script>
+
+<style>
+  .preview-page {
+    padding: 20px 0 48px;
+  }
+  .toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+  }
+  .left {
+    display: grid;
+    gap: 8px;
+  }
+  .back {
+    color: var(--accent);
+    font-size: 13.5px;
+    font-weight: 700;
+  }
+  h1 {
+    margin: 0;
+    font-size: clamp(24px, 3vw, 30px);
+    font-weight: 600;
+  }
+  .sub {
+    margin: 4px 0 0;
+    color: var(--muted);
+    font-size: 13.5px;
+    font-weight: 500;
+  }
+  .right {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: end;
+  }
+  .svc-label {
+    display: grid;
+    gap: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--muted);
+  }
+  .svc-label select {
+    min-height: 38px;
+    border-radius: 999px;
+    border: 1px solid var(--line-strong);
+    background: #fff;
+    padding: 0 14px;
+    font: inherit;
+    min-width: 180px;
+  }
+  .frame-shell {
+    background: rgba(255, 255, 255, 0.92);
+    border: 1px solid rgba(255, 255, 255, 0.85);
+    border-radius: 20px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+  }
+  .chrome {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--line);
+    background: rgba(243, 241, 234, 0.75);
+  }
+  .dots {
+    display: flex;
+    gap: 6px;
+  }
+  .dots i {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #d1cdc4;
+    display: block;
+  }
+  .dots i:nth-child(1) {
+    background: #ff6b6b;
+  }
+  .dots i:nth-child(2) {
+    background: #ffd166;
+  }
+  .dots i:nth-child(3) {
+    background: #6bcb77;
+  }
+  .addr {
+    flex: 1;
+    min-width: 0;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--ink-soft);
+    background: rgba(255, 255, 255, 0.85);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 7px 12px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .badge {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    color: #0f766e;
+    background: rgba(15, 159, 138, 0.12);
+    border-radius: 999px;
+    padding: 4px 10px;
+  }
+  .badge.violet {
+    color: #5b4dff;
+    background: var(--accent-soft);
+  }
+  .badge.amber {
+    color: #c2410c;
+    background: rgba(234, 88, 12, 0.12);
+  }
+  .frame-wrap {
+    position: relative;
+    height: min(78vh, 860px);
+    background: #f7f5ef;
+  }
+  iframe {
+    width: 100%;
+    height: 100%;
+    border: 0;
+    display: block;
+    background: #fff;
+  }
+  .loading {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    color: var(--muted);
+    font-size: 14px;
+    font-weight: 600;
+    background: rgba(247, 245, 239, 0.72);
+    pointer-events: none;
+    z-index: 1;
+  }
+  .note {
+    margin: 0;
+    padding: 12px 16px 14px;
+    font-size: 12.5px;
+    color: var(--muted);
+    font-weight: 500;
+    border-top: 1px solid var(--line);
+    line-height: 1.55;
+  }
+  @media (max-width: 860px) {
+    .frame-wrap {
+      height: 70vh;
+    }
+    .toolbar {
+      align-items: stretch;
+    }
+  }
+</style>

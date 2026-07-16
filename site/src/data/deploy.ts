@@ -47,7 +47,7 @@ export function getProjectDeploy(projectKey: string): ProjectDeploy | undefined 
   return PROJECT_DEPLOYS.find((p) => p.projectKey === projectKey);
 }
 
-/** Primary "预览项目" URL for a project slug/key. */
+/** Primary live deploy URL for a project slug/key (for iframe embed). */
 export function getPrimaryPreviewUrl(projectKey: string): string | undefined {
   const deploy = getProjectDeploy(projectKey);
   if (!deploy) return undefined;
@@ -55,6 +55,12 @@ export function getPrimaryPreviewUrl(projectKey: string): string | undefined {
     deploy.services.find((s) => s.isPrimaryPreview) ?? deploy.services[0];
   if (!primary) return undefined;
   return buildDeployUrl(primary.port, primary.path);
+}
+
+export function getPrimaryService(projectKey: string): DeployService | undefined {
+  const deploy = getProjectDeploy(projectKey);
+  if (!deploy) return undefined;
+  return deploy.services.find((s) => s.isPrimaryPreview) ?? deploy.services[0];
 }
 
 export function getAllDeployRows(): Array<{

@@ -32,7 +32,7 @@ const rows = getAllDeployRows();
         <span class="live-dot"><i></i> LIVE DEMO</span>
         <span class="host">Deploy host · <b>{DEPLOY_HOST}</b></span>
       </div>
-      <div class="hint">点击「预览项目」访问服务器部署实例（新标签打开）</div>
+      <div class="hint">点击「预览项目」进入站内内嵌预览页</div>
     </div>
 
     <div class="filters" role="toolbar" aria-label="项目筛选" data-project-filters>
@@ -71,12 +71,7 @@ const rows = getAllDeployRows();
           {featured.tags.map((t) => <span class="tag">{t}</span>)}
         </div>
         <div class="actions">
-          <a
-            class="btn btn-preview"
-            href={featuredPreview}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
+          <a class="btn btn-preview" href={path(`/projects/${featured.slug}/preview`)}>
             预览项目
           </a>
           <a class="btn btn-light" href={path(`/projects/${featured.slug}`)}>查看详情</a>
