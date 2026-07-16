@@ -46,7 +46,12 @@ const toneBtn =
         <h1 class="serif">{project.title}</h1>
         <p class="lead">{project.summary}</p>
         <div class="actions">
-          <a class:list={['btn', 'btn-preview', toneBtn]} href={path(`/projects/${project.slug}/preview`)}>
+          <a
+            class:list={['btn', 'btn-preview', toneBtn]}
+            href={preview}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             <span class="play" aria-hidden="true">▶</span> 预览项目
           </a>
           {
@@ -70,8 +75,8 @@ const toneBtn =
       <aside class="deploy-panel" aria-label="在线部署与预览">
         <div class:list={['head', project.coverTone]}>
           <div class="k">ONLINE DEPLOYMENT</div>
-          <h2 class="serif">站内预览</h2>
-          <p>服务器 IP · {DEPLOY_HOST} · 本站内嵌打开</p>
+          <h2 class="serif">在线预览入口</h2>
+          <p>服务器 IP · {DEPLOY_HOST} · 新标签打开</p>
         </div>
         <div class="body">
           <div class="svc">
@@ -82,14 +87,21 @@ const toneBtn =
                     <span class="name">{s.name}</span>
                     <span class="port">:{s.port}</span>
                   </div>
-                  <span class="svc-url">{buildDeployUrl(s.port, s.path)}</span>
+                  <a href={buildDeployUrl(s.port, s.path)} target="_blank" rel="noopener noreferrer">
+                    {buildDeployUrl(s.port, s.path)}
+                  </a>
                 </div>
               ))
             }
           </div>
           <div class="deploy-cta">
-            <a class:list={['btn', 'btn-preview', toneBtn]} href={path(`/projects/${project.slug}/preview`)}>
-              <span class="play" aria-hidden="true">▶</span> 打开站内预览
+            <a
+              class:list={['btn', 'btn-preview', toneBtn]}
+              href={preview}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <span class="play" aria-hidden="true">▶</span> 预览项目
             </a>
           </div>
         </div>
@@ -99,9 +111,14 @@ const toneBtn =
     <div class="preview-band">
       <div>
         <h3 class="serif">想直接看线上效果？</h3>
-        <p>进入站内预览页，以 iframe 内嵌部署实例（不新开窗口）。</p>
+        <p>主按钮将在新标签打开服务器部署实例。</p>
       </div>
-      <a class:list={['btn', 'btn-preview', toneBtn]} href={path(`/projects/${project.slug}/preview`)}>
+      <a
+        class:list={['btn', 'btn-preview', toneBtn]}
+        href={preview}
+        target="_blank"
+        rel="noopener noreferrer"
+      >
         <span class="play" aria-hidden="true">▶</span> 预览项目
       </a>
     </div>
@@ -288,13 +305,16 @@ const toneBtn =
     border-radius: 999px;
     padding: 3px 8px;
   }
-  .svc-url {
+  .svc-item a {
     display: block;
     font-family: var(--font-mono);
     font-size: 12px;
     color: var(--ink-soft);
     font-weight: 500;
     word-break: break-all;
+  }
+  .svc-item a:hover {
+    color: var(--accent);
   }
   .deploy-cta .btn {
     width: 100%;

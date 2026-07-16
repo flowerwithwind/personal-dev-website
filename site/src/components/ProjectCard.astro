@@ -40,7 +40,9 @@ const toneClass = project.coverTone;
     <div class="actions">
       <a
         class:list={['btn', 'btn-preview', 'btn-sm', toneClass]}
-        href={path(`/projects/${project.slug}/preview`)}
+        href={preview}
+        target="_blank"
+        rel="noopener noreferrer"
       >
         预览项目
       </a>
