@@ -2,6 +2,14 @@
 
 export const DEPLOY_HOST = '1.14.106.17';
 
+/**
+ * Demo servers currently speak plain HTTP.
+ * GitHub Pages is HTTPS → browsers block HTTP iframes (Mixed Content).
+ * When you terminate TLS (nginx/Caddy/Cloudflare), set this to 'https'
+ * so in-page iframe embed can work.
+ */
+export const DEPLOY_PROTOCOL: 'http' | 'https' = 'http';
+
 export type DeployService = {
   name: string;
   port: number;
@@ -40,7 +48,12 @@ export const PROJECT_DEPLOYS: ProjectDeploy[] = [
 
 export function buildDeployUrl(port: number, path = '/'): string {
   const normalized = path.startsWith('/') ? path : `/${path}`;
-  return `http://${DEPLOY_HOST}:${port}${normalized === '/' ? '/' : normalized}`;
+  return `${DEPLOY_PROTOCOL}://${DEPLOY_HOST}:${port}${normalized === '/' ? '/' : normalized}`;
+}
+
+/** True when an HTTPS page cannot embed this URL in an iframe. */
+export function isMixedContentEmbedBlocked(pageProtocol: string, targetUrl: string): boolean {
+  return pageProtocol === 'https:' && /^http:\/\//i.test(targetUrl);
 }
 
 export function getProjectDeploy(projectKey: string): ProjectDeploy | undefined {

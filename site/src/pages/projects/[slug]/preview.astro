@@ -36,7 +36,7 @@ const tone =
         <a class="back" href={path(`/projects/${project.slug}`)}>← 返回详情</a>
         <div class="titles">
           <h1 class="serif">{project.title}</h1>
-          <p class="sub">站内内嵌预览 · 部署于 {DEPLOY_HOST}</p>
+          <p class="sub">站内预览 · 部署于 {DEPLOY_HOST}</p>
         </div>
       </div>
       <div class="right">
@@ -56,6 +56,7 @@ const tone =
             }
           </select>
         </label>
+        <button type="button" class="btn btn-dark btn-sm" id="open-same-tab">本页打开演示</button>
         <a class="btn btn-light btn-sm" id="open-external" href={defaultUrl} target="_blank" rel="noopener noreferrer">
           新标签打开
         </a>
@@ -63,25 +64,43 @@ const tone =
       </div>
     </div>
 
-    <div class="frame-shell container">
+    <div class="frame-shell container" id="preview-shell">
       <div class="chrome">
         <div class="dots" aria-hidden="true"><i></i><i></i><i></i></div>
         <div class="addr" id="preview-addr">{defaultUrl}</div>
-        <span class:list={['badge', tone]}>LIVE</span>
+        <span class:list={['badge', tone]} id="preview-badge">LIVE</span>
       </div>
+
       <div class="frame-wrap">
-        <div class="loading" id="frame-loading">正在加载预览…</div>
+        <!-- iframe only used when embed is allowed (HTTPS→HTTPS or HTTP page→HTTP) -->
         <iframe
           id="preview-frame"
           title={`${project.title} 在线预览`}
-          src={defaultUrl}
+          src="about:blank"
           loading="lazy"
           referrerpolicy="no-referrer-when-downgrade"
           allow="clipboard-read; clipboard-write; fullscreen"
+          hidden
         ></iframe>
+
+        <div class="state" id="preview-state" aria-live="polite">
+          <div class="state-card">
+            <div class="state-icon" aria-hidden="true">🔒</div>
+            <h2 class="serif" id="state-title">正在检测预览环境…</h2>
+            <p id="state-desc">请稍候。</p>
+            <div class="state-actions">
+              <button type="button" class="btn btn-dark" id="state-same-tab">在本页打开演示站</button>
+              <a class="btn btn-light" id="state-new-tab" href={defaultUrl} target="_blank" rel="noopener noreferrer">
+                新标签打开
+              </a>
+            </div>
+            <p class="state-tip" id="state-tip" hidden></p>
+          </div>
+        </div>
       </div>
-      <p class="note">
-        若预览区空白，可能是目标站点禁止被嵌入（X-Frame-Options / CSP）。可点「新标签打开」访问完整页面，或切换上方服务入口。
+
+      <p class="note" id="preview-note">
+        说明：GitHub Pages 为 HTTPS。若演示站仍是 <code>http://</code>，浏览器会拦截 iframe 混合内容（Mixed Content），这不是你的项目挂了。新标签可打开是因为整页跳转到 HTTP。
       </p>
     </div>
   </div>
@@ -89,42 +108,131 @@ const tone =
 
 <script is:inline>
   (function () {
+    function isHttpUrl(url) {
+      return /^http:\/\//i.test(url || '');
+    }
+    function isHttpsPage() {
+      return location.protocol === 'https:';
+    }
+    /** Browser blocks embedding HTTP frame inside HTTPS page */
+    function isMixedContentBlocked(url) {
+      return isHttpsPage() && isHttpUrl(url);
+    }
+
     function boot() {
       var select = document.getElementById('preview-service');
       var frame = document.getElementById('preview-frame');
       var addr = document.getElementById('preview-addr');
       var openExt = document.getElementById('open-external');
+      var openSame = document.getElementById('open-same-tab');
       var reload = document.getElementById('reload-frame');
-      var loading = document.getElementById('frame-loading');
+      var state = document.getElementById('preview-state');
+      var stateTitle = document.getElementById('state-title');
+      var stateDesc = document.getElementById('state-desc');
+      var stateTip = document.getElementById('state-tip');
+      var stateSame = document.getElementById('state-same-tab');
+      var stateNew = document.getElementById('state-new-tab');
+      var badge = document.getElementById('preview-badge');
       if (!select || !frame || select.dataset.bound === '1') return;
       select.dataset.bound = '1';
 
-      function setUrl(url) {
-        if (!url) return;
-        if (loading) loading.hidden = false;
-        frame.src = url;
+      function currentUrl() {
+        return select.value || select.getAttribute('data-default-url') || '';
+      }
+
+      function syncLinks(url) {
         if (addr) addr.textContent = url;
         if (openExt) openExt.setAttribute('href', url);
+        if (stateNew) stateNew.setAttribute('href', url);
+      }
+
+      function showMixedContentUI(url) {
+        frame.hidden = true;
+        frame.removeAttribute('src');
+        frame.src = 'about:blank';
+        if (state) state.hidden = false;
+        if (badge) {
+          badge.textContent = '受限';
+          badge.classList.add('warn');
+        }
+        if (stateTitle) stateTitle.textContent = '无法在 HTTPS 页面内嵌 HTTP 演示';
+        if (stateDesc) {
+          stateDesc.innerHTML =
+            '个人站运行在 <strong>HTTPS</strong>（GitHub Pages），而演示地址是 <strong>HTTP</strong>（' +
+            url +
+            '）。浏览器安全策略会拦截这种 iframe，所以会一直「加载中」。项目本身可以正常访问。';
+        }
+        if (stateTip) {
+          stateTip.hidden = false;
+          stateTip.innerHTML =
+            '可选解决：① 点下方「在本页打开演示站」（当前标签跳转到 HTTP，不是弹窗）② 给服务器配置 HTTPS 后即可真正内嵌。控制台里的 <code>chrome-extension://</code> 报错来自浏览器插件，可忽略。';
+        }
+      }
+
+      function showEmbedUI(url) {
+        if (state) state.hidden = true;
+        if (badge) {
+          badge.textContent = 'LIVE';
+          badge.classList.remove('warn');
+        }
+        frame.hidden = false;
+        if (state) {
+          // brief loading overlay via state card when embedding
+        }
+        // show simple loading text overlay by reusing state briefly? keep iframe only
+        frame.src = url;
+      }
+
+      function showBlockedEmbedUI(url) {
+        // X-Frame-Options etc. — hard to detect reliably; user can switch
+        frame.hidden = true;
+        if (state) state.hidden = false;
+        if (badge) {
+          badge.textContent = '受限';
+          badge.classList.add('warn');
+        }
+        if (stateTitle) stateTitle.textContent = '目标站可能禁止被嵌入';
+        if (stateDesc) {
+          stateDesc.textContent =
+            '演示站可能设置了 X-Frame-Options / CSP，禁止被 iframe 嵌套。可用本页打开或新标签访问。';
+        }
+        if (stateTip) {
+          stateTip.hidden = false;
+          stateTip.textContent = '地址：' + url;
+        }
+      }
+
+      function applyUrl(url) {
+        if (!url) return;
+        syncLinks(url);
+        if (isMixedContentBlocked(url)) {
+          showMixedContentUI(url);
+          return;
+        }
+        showEmbedUI(url);
+      }
+
+      function goSameTab() {
+        var url = currentUrl();
+        if (url) location.assign(url);
       }
 
       select.addEventListener('change', function () {
-        setUrl(select.value);
+        applyUrl(select.value);
       });
 
       if (reload) {
         reload.addEventListener('click', function () {
-          setUrl(frame.src);
+          applyUrl(currentUrl());
         });
       }
+      if (openSame) openSame.addEventListener('click', goSameTab);
+      if (stateSame) stateSame.addEventListener('click', goSameTab);
 
-      frame.addEventListener('load', function () {
-        if (loading) loading.hidden = true;
-      });
-      // hide spinner after a while even if load event is blocked cross-origin
-      setTimeout(function () {
-        if (loading) loading.hidden = true;
-      }, 2500);
+      // Initial
+      applyUrl(currentUrl());
     }
+
     boot();
     document.addEventListener('astro:page-load', function () {
       var select = document.getElementById('preview-service');
@@ -255,10 +363,17 @@ const tone =
     color: #c2410c;
     background: rgba(234, 88, 12, 0.12);
   }
+  .badge.warn {
+    color: #b45309;
+    background: rgba(245, 158, 11, 0.16);
+  }
   .frame-wrap {
     position: relative;
     height: min(78vh, 860px);
-    background: #f7f5ef;
+    background:
+      radial-gradient(600px 280px at 20% 10%, rgba(91, 77, 255, 0.08), transparent 55%),
+      radial-gradient(500px 240px at 90% 80%, rgba(15, 159, 138, 0.08), transparent 50%),
+      #f7f5ef;
   }
   iframe {
     width: 100%;
@@ -267,17 +382,60 @@ const tone =
     display: block;
     background: #fff;
   }
-  .loading {
+  .state {
     position: absolute;
     inset: 0;
     display: grid;
     place-items: center;
-    color: var(--muted);
-    font-size: 14px;
+    padding: 24px;
+    z-index: 2;
+  }
+  .state-card {
+    width: min(100%, 520px);
+    background: rgba(255, 255, 255, 0.96);
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    box-shadow: var(--shadow);
+    padding: 28px 24px;
+    text-align: center;
+  }
+  .state-icon {
+    font-size: 28px;
+    margin-bottom: 8px;
+  }
+  .state-card h2 {
+    margin: 0 0 10px;
+    font-size: 22px;
     font-weight: 600;
-    background: rgba(247, 245, 239, 0.72);
-    pointer-events: none;
-    z-index: 1;
+  }
+  .state-card p {
+    margin: 0 0 18px;
+    color: var(--ink-soft);
+    font-size: 14.5px;
+    font-weight: 500;
+    line-height: 1.65;
+    text-align: left;
+  }
+  .state-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    margin-bottom: 12px;
+  }
+  .state-tip {
+    margin: 0;
+    font-size: 12.5px;
+    color: var(--muted);
+    line-height: 1.6;
+    text-align: left;
+  }
+  .state-tip code {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    background: rgba(12, 11, 16, 0.05);
+    padding: 1px 5px;
+    border-radius: 4px;
   }
   .note {
     margin: 0;
@@ -287,6 +445,10 @@ const tone =
     font-weight: 500;
     border-top: 1px solid var(--line);
     line-height: 1.55;
+  }
+  .note code {
+    font-family: var(--font-mono);
+    font-size: 11.5px;
   }
   @media (max-width: 860px) {
     .frame-wrap {

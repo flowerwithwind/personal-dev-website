@@ -5,6 +5,7 @@ import {
   getAllDeployRows,
   getPrimaryPreviewUrl,
   getProjectDeploy,
+  isMixedContentEmbedBlocked,
 } from '../src/data/deploy';
 import {
   getAllProjects,
@@ -57,6 +58,13 @@ describe('deploy URL mapping', () => {
   it('exposes API health for code-review-agent', () => {
     const deploy = getProjectDeploy('code-review-agent');
     expect(deploy?.services.some((s) => s.port === 18001)).toBe(true);
+  });
+
+  it('detects HTTPS page cannot embed HTTP demo URLs', () => {
+    const httpDemo = `http://${DEPLOY_HOST}:18082/`;
+    expect(isMixedContentEmbedBlocked('https:', httpDemo)).toBe(true);
+    expect(isMixedContentEmbedBlocked('http:', httpDemo)).toBe(false);
+    expect(isMixedContentEmbedBlocked('https:', 'https://example.com/')).toBe(false);
   });
 });
 
