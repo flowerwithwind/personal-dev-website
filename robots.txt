@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://flowerwithwind.github.io/personal-dev-website/sitemap-index.xml

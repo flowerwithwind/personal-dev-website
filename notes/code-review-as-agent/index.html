@@ -1,0 +1,124 @@
+<!DOCTYPE html><html lang="zh-CN"> <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="上下文裁剪、规范检索、失败回退与协作流回写——从脚本到系统的路径。"><meta name="generator" content="Astro v4.16.19"><link rel="icon" type="image/svg+xml" href="/personal-dev-website/favicon.svg"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+SC:wght@400;500;600;700&family=Noto+Serif+SC:wght@500;600;700&display=swap" rel="stylesheet"><meta name="astro-view-transitions-enabled" content="true"><meta name="astro-view-transitions-fallback" content="animate"><title>把 Code Review 做成 Agent，而不是把 Diff 丢给大模型 · 赵海蓺</title><link rel="stylesheet" href="/personal-dev-website/_astro/about.BCqFscY2.css">
+<style>.crumb[data-astro-cid-fezs4xpw]{padding:28px 0 8px;font-size:13px;font-weight:600;color:var(--muted);display:flex;gap:8px}.crumb[data-astro-cid-fezs4xpw] a[data-astro-cid-fezs4xpw]{color:var(--accent)}.article-wrap[data-astro-cid-fezs4xpw]{max-width:740px;margin:0 auto;padding:12px 24px 48px}.article-card[data-astro-cid-fezs4xpw]{background:#ffffffeb;border:1px solid rgba(255,255,255,.8);border-radius:24px;box-shadow:var(--shadow);padding:36px 40px 40px;backdrop-filter:blur(10px)}.cat[data-astro-cid-fezs4xpw]{font-size:12.5px;font-weight:700;color:var(--accent);margin-bottom:12px}h1[data-astro-cid-fezs4xpw]{font-size:clamp(28px,4vw,34px);font-weight:600;line-height:1.28;letter-spacing:-.02em;margin:0 0 14px}.meta[data-astro-cid-fezs4xpw]{display:flex;flex-wrap:wrap;gap:12px 18px;color:#0c0b106b;font-size:13px;font-weight:600;margin-bottom:28px;padding-bottom:20px;border-bottom:1px solid var(--line)}.related[data-astro-cid-fezs4xpw]{margin-top:28px;display:grid;grid-template-columns:1fr 1fr;gap:12px}.related[data-astro-cid-fezs4xpw] a[data-astro-cid-fezs4xpw]{display:block;padding:14px 16px;border-radius:14px;background:#ffffffbf;border:1px solid var(--line)}.related[data-astro-cid-fezs4xpw] strong[data-astro-cid-fezs4xpw]{display:block;font-size:12px;color:var(--accent);margin-bottom:6px}.related[data-astro-cid-fezs4xpw] span[data-astro-cid-fezs4xpw]{font-size:14px;font-weight:600}@media (max-width: 640px){.article-card[data-astro-cid-fezs4xpw]{padding:24px 18px 28px}.related[data-astro-cid-fezs4xpw]{grid-template-columns:1fr}}
+</style><script type="module" src="/personal-dev-website/_astro/hoisted.BScVxmeO.js"></script><style>[data-astro-transition-scope="astro-xcoijgkp-1"] { view-transition-name: astro-xcoijgkp-1; }@layer astro { ::view-transition-old(astro-xcoijgkp-1) { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeOut; }::view-transition-new(astro-xcoijgkp-1) { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeIn; }[data-astro-transition=back]::view-transition-old(astro-xcoijgkp-1) { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeOut; }[data-astro-transition=back]::view-transition-new(astro-xcoijgkp-1) { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeIn; } }[data-astro-transition-fallback="old"] [data-astro-transition-scope="astro-xcoijgkp-1"],
+			[data-astro-transition-fallback="old"][data-astro-transition-scope="astro-xcoijgkp-1"] { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeOut; }[data-astro-transition-fallback="new"] [data-astro-transition-scope="astro-xcoijgkp-1"],
+			[data-astro-transition-fallback="new"][data-astro-transition-scope="astro-xcoijgkp-1"] { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeIn; }[data-astro-transition=back][data-astro-transition-fallback="old"] [data-astro-transition-scope="astro-xcoijgkp-1"],
+			[data-astro-transition=back][data-astro-transition-fallback="old"][data-astro-transition-scope="astro-xcoijgkp-1"] { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeOut; }[data-astro-transition=back][data-astro-transition-fallback="new"] [data-astro-transition-scope="astro-xcoijgkp-1"],
+			[data-astro-transition=back][data-astro-transition-fallback="new"][data-astro-transition-scope="astro-xcoijgkp-1"] { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeIn; }</style></head> <body> <div class="atmosphere" aria-hidden="true" data-atmosphere data-astro-cid-p7ciunqv> <div class="orb orb-a" data-depth="0.12" data-astro-cid-p7ciunqv></div> <div class="orb orb-b" data-depth="0.2" data-astro-cid-p7ciunqv></div> <div class="orb orb-c" data-depth="0.08" data-astro-cid-p7ciunqv></div> <svg class="art art-left" data-depth="0.15" viewBox="0 0 280 420" fill="none" xmlns="http://www.w3.org/2000/svg" data-astro-cid-p7ciunqv> <path d="M40 380 C60 300 40 240 90 180 C130 130 100 90 120 40" stroke="rgba(15,159,138,0.22)" stroke-width="1.5" data-astro-cid-p7ciunqv></path> <path d="M90 180 C120 200 160 190 190 150" stroke="rgba(91,77,255,0.16)" stroke-width="1.2" data-astro-cid-p7ciunqv></path> <ellipse cx="120" cy="48" rx="28" ry="14" transform="rotate(-28 120 48)" fill="rgba(15,159,138,0.14)" data-astro-cid-p7ciunqv></ellipse> <ellipse cx="148" cy="72" rx="22" ry="11" transform="rotate(18 148 72)" fill="rgba(91,77,255,0.12)" data-astro-cid-p7ciunqv></ellipse> <ellipse cx="98" cy="88" rx="18" ry="9" transform="rotate(-12 98 88)" fill="rgba(244,114,182,0.1)" data-astro-cid-p7ciunqv></ellipse> <circle cx="190" cy="150" r="6" fill="rgba(245,158,11,0.25)" data-astro-cid-p7ciunqv></circle> <circle cx="206" cy="138" r="3.5" fill="rgba(91,77,255,0.2)" data-astro-cid-p7ciunqv></circle> <path d="M70 260 C95 245 110 270 95 290 C80 305 60 285 70 260Z" fill="rgba(15,159,138,0.1)" data-astro-cid-p7ciunqv></path> <path d="M100 220 C125 205 145 230 125 250 C110 262 90 240 100 220Z" fill="rgba(91,77,255,0.08)" data-astro-cid-p7ciunqv></path> </svg> <svg class="art art-right" data-depth="0.18" viewBox="0 0 300 460" fill="none" xmlns="http://www.w3.org/2000/svg" data-astro-cid-p7ciunqv> <path d="M220 40 C200 120 240 170 200 240 C170 290 210 330 190 400" stroke="rgba(91,77,255,0.14)" stroke-width="1.4" data-astro-cid-p7ciunqv></path> <path d="M200 240 C160 230 140 260 155 285" stroke="rgba(15,159,138,0.16)" stroke-width="1.1" data-astro-cid-p7ciunqv></path> <ellipse cx="188" cy="402" rx="32" ry="15" transform="rotate(24 188 402)" fill="rgba(244,114,182,0.1)" data-astro-cid-p7ciunqv></ellipse> <ellipse cx="160" cy="378" rx="24" ry="12" transform="rotate(-20 160 378)" fill="rgba(91,77,255,0.1)" data-astro-cid-p7ciunqv></ellipse> <ellipse cx="210" cy="370" rx="20" ry="10" transform="rotate(8 210 370)" fill="rgba(15,159,138,0.12)" data-astro-cid-p7ciunqv></ellipse> <circle cx="155" cy="285" r="5" fill="rgba(245,158,11,0.22)" data-astro-cid-p7ciunqv></circle> <path d="M230 120 C250 100 275 125 255 150 C240 165 215 145 230 120Z" fill="rgba(91,77,255,0.09)" data-astro-cid-p7ciunqv></path> <path d="M250 180 C270 165 290 190 270 210 C255 222 235 200 250 180Z" fill="rgba(15,159,138,0.09)" data-astro-cid-p7ciunqv></path> </svg> <svg class="art art-mid" data-depth="0.06" viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg" data-astro-cid-p7ciunqv> <path d="M10 80 C40 40 70 100 100 50 C130 10 160 70 190 40" stroke="rgba(12,11,16,0.05)" stroke-width="1" stroke-dasharray="3 6" data-astro-cid-p7ciunqv></path> </svg> </div>  <script>
+  (function () {
+    function bindAtmosphere() {
+      var root = document.querySelector('[data-atmosphere]');
+      if (!root || root.dataset.bound === '1') return;
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      root.dataset.bound = '1';
+      var layers = root.querySelectorAll('[data-depth]');
+      var ticking = false;
+      var onScroll = function () {
+        if (ticking) return;
+        ticking = true;
+        requestAnimationFrame(function () {
+          var y = window.scrollY || 0;
+          layers.forEach(function (el) {
+            var depth = Number(el.getAttribute('data-depth') || 0.1);
+            var shift = y * depth;
+            if (el.classList.contains('art-mid')) {
+              el.style.transform = 'translateX(-50%) translate3d(0,' + shift + 'px,0)';
+            } else {
+              el.style.transform = 'translate3d(0,' + shift + 'px,0)';
+            }
+          });
+          ticking = false;
+        });
+      };
+      onScroll();
+      window.addEventListener('scroll', onScroll, { passive: true });
+    }
+    bindAtmosphere();
+    document.addEventListener('astro:page-load', function () {
+      var root = document.querySelector('[data-atmosphere]');
+      if (root) root.dataset.bound = '';
+      bindAtmosphere();
+    });
+  })();
+</script> <header class="site-header" data-header data-astro-cid-3ef6ksr2> <div class="header-inner container" data-astro-cid-3ef6ksr2> <a class="logo" href="/personal-dev-website/" data-astro-cid-3ef6ksr2> <span class="logo-mark" aria-hidden="true" data-astro-cid-3ef6ksr2> <svg viewBox="0 0 36 36" width="34" height="34" fill="none" data-astro-cid-3ef6ksr2> <circle cx="18" cy="18" r="16.5" stroke="currentColor" stroke-width="1.2" opacity="0.35" data-astro-cid-3ef6ksr2></circle> <circle cx="18" cy="18" r="12" fill="rgba(243,241,234,0.65)" data-astro-cid-3ef6ksr2></circle> <text x="18" y="22.5" text-anchor="middle" font-family="Noto Serif SC, Songti SC, serif" font-size="14" font-weight="600" fill="currentColor" data-astro-cid-3ef6ksr2>艺</text> </svg> </span> <span class="logo-text" data-astro-cid-3ef6ksr2>赵海蓺</span> </a> <nav class="nav desktop-nav" aria-label="主导航" data-astro-cid-3ef6ksr2> <a href="/personal-dev-website/" data-astro-cid-3ef6ksr2> 首页 </a><a href="/personal-dev-website/notes" class="is-active" aria-current="page" data-astro-cid-3ef6ksr2> 笔记 </a><a href="/personal-dev-website/projects" data-astro-cid-3ef6ksr2> 项目 </a><a href="/personal-dev-website/about" data-astro-cid-3ef6ksr2> 关于 </a> <a class="btn btn-dark btn-sm nav-cta" href="/personal-dev-website/resume.pdf" download="赵海蓺-简历.pdf" data-astro-cid-3ef6ksr2>下载简历</a> </nav> <div class="header-right-mobile" data-astro-cid-3ef6ksr2> <a class="btn btn-dark btn-sm resume-m" href="/personal-dev-website/resume.pdf" download="赵海蓺-简历.pdf" data-astro-cid-3ef6ksr2>简历</a> <button class="menu-toggle" type="button" aria-label="打开菜单" aria-expanded="false" data-menu-toggle data-astro-cid-3ef6ksr2> <span data-astro-cid-3ef6ksr2></span><span data-astro-cid-3ef6ksr2></span><span data-astro-cid-3ef6ksr2></span> </button> </div> </div> <nav class="mobile-nav" aria-label="移动导航" data-mobile-nav hidden data-astro-cid-3ef6ksr2> <a href="/personal-dev-website/" data-astro-cid-3ef6ksr2> 首页 </a><a href="/personal-dev-website/notes" class="is-active" data-astro-cid-3ef6ksr2> 笔记 </a><a href="/personal-dev-website/projects" data-astro-cid-3ef6ksr2> 项目 </a><a href="/personal-dev-website/about" data-astro-cid-3ef6ksr2> 关于 </a> <a href="/personal-dev-website/resume.pdf" download="赵海蓺-简历.pdf" data-astro-cid-3ef6ksr2>下载简历</a> <a href="/personal-dev-website/login" data-auth-link data-astro-cid-3ef6ksr2>登录写笔记</a> </nav> </header>  <script>
+  (function () {
+    function bindHeader() {
+      var header = document.querySelector('[data-header]');
+      var toggle = document.querySelector('[data-menu-toggle]');
+      var mobile = document.querySelector('[data-mobile-nav]');
+      if (!header || header.dataset.bound === '1') return;
+      header.dataset.bound = '1';
+      var onScroll = function () {
+        header.classList.toggle('is-solid', window.scrollY > 8);
+      };
+      onScroll();
+      window.addEventListener('scroll', onScroll, { passive: true });
+      if (toggle && mobile) {
+        toggle.addEventListener('click', function () {
+          var open = mobile.classList.toggle('is-open');
+          mobile.hidden = !open;
+          toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+        });
+      }
+    }
+    bindHeader();
+    document.addEventListener('astro:page-load', function () {
+      var header = document.querySelector('[data-header]');
+      if (header) header.dataset.bound = '';
+      bindHeader();
+    });
+  })();
+</script> <main class="page-enter" data-astro-transition-scope="astro-xcoijgkp-1">  <div class="container" data-astro-cid-fezs4xpw> <div class="crumb" data-astro-cid-fezs4xpw> <a href="/personal-dev-website/notes" data-astro-cid-fezs4xpw>笔记</a> <span data-astro-cid-fezs4xpw>/</span> <span data-astro-cid-fezs4xpw>Essay · Agent</span> </div> </div> <article class="article-wrap" data-astro-cid-fezs4xpw> <div class="article-card" data-astro-cid-fezs4xpw> <div class="cat" data-astro-cid-fezs4xpw>Essay · Agent</div> <h1 class="serif" data-astro-cid-fezs4xpw>把 Code Review 做成 Agent，而不是把 Diff 丢给大模型</h1> <div class="meta" data-astro-cid-fezs4xpw> <span data-astro-cid-fezs4xpw>2026-07-12</span> <span data-astro-cid-fezs4xpw>约 12 分钟</span> <span data-astro-cid-fezs4xpw>状态：已发布</span> </div> <div class="prose" data-astro-cid-fezs4xpw><p>很多「AI 代码评审」停在同一层：把 PR Diff 塞进提示词，等模型吐出一段意见。它能跑，但很难稳定、很难接入协作、也很难解释为什么这次有效、下次失效。</p>
+<p>我更关心的是：如何把它做成一个<strong>可触发、可增量、可回写 GitHub、可被规范知识增强</strong>的系统。</p>
+<h2>问题拆解</h2>
+<ul>
+<li>上下文过长导致 token 失控，或裁剪过狠丢掉关键变更。</li>
+<li>缺少仓库规范与历史评审经验，建议泛化、不可执行。</li>
+<li>结果无法回到 PR 评论流，停留在本地报告。</li>
+</ul>
+<blockquote>
+<p>Agent 的价值不在「更会说话」，而在「更能可靠地完成工作闭环」。</p>
+</blockquote>
+<h2>一条可用的流水线</h2>
+<pre><code>PR Event → Webhook
+  → Diff 解析 / 语言过滤
+  → 分块增量审查
+  → RAG：规范 / 历史 / 最佳实践
+  → 多维度结构化输出
+  → PR Comment + 报告
+</code></pre>
+<h2>仍在思考</h2>
+<p>如何量化评审质量？如何把「高风险问题」与 CI 门禁结合？这些会在后续笔记里继续生长。</p>
+</div> </div> <div class="related" data-astro-cid-fezs4xpw> <a href="/personal-dev-website/projects/code-review-agent" data-astro-cid-fezs4xpw> <strong data-astro-cid-fezs4xpw>关联项目</strong> <span data-astro-cid-fezs4xpw>Code Review Agent →</span> </a> <a href="/personal-dev-website/notes/nl2sql-rag-layers" data-astro-cid-fezs4xpw> <strong data-astro-cid-fezs4xpw>相关笔记</strong> <span data-astro-cid-fezs4xpw>NL2SQL 失败时，检索应发生在哪一层？ →</span> </a><a href="/personal-dev-website/notes/agent-observability-notes" data-astro-cid-fezs4xpw> <strong data-astro-cid-fezs4xpw>相关笔记</strong> <span data-astro-cid-fezs4xpw>本周札记：可观测性与 Agent 调试 →</span> </a>  </div> </article>  </main> <footer class="site-footer" data-astro-cid-sz7xmlte> <div class="footer-inner container" data-astro-cid-sz7xmlte> <div data-astro-cid-sz7xmlte> <a class="logo" href="/personal-dev-website/" data-astro-cid-sz7xmlte> <span class="logo-mark" aria-hidden="true" data-astro-cid-sz7xmlte> <svg viewBox="0 0 36 36" width="28" height="28" fill="none" data-astro-cid-sz7xmlte> <circle cx="18" cy="18" r="16.5" stroke="currentColor" stroke-width="1.2" opacity="0.35" data-astro-cid-sz7xmlte></circle> <text x="18" y="22.5" text-anchor="middle" font-family="Noto Serif SC, Songti SC, serif" font-size="14" font-weight="600" fill="currentColor" data-astro-cid-sz7xmlte>艺</text> </svg> </span> <span class="logo-text" data-astro-cid-sz7xmlte>赵海蓺</span> </a> <p data-astro-cid-sz7xmlte>个人数字主页 · 笔记、项目与构建记录</p> </div> <div class="footer-cols" data-astro-cid-sz7xmlte> <div class="footer-col" data-astro-cid-sz7xmlte> <h4 data-astro-cid-sz7xmlte>导航</h4> <a href="/personal-dev-website/notes" data-astro-cid-sz7xmlte>笔记</a> <a href="/personal-dev-website/projects" data-astro-cid-sz7xmlte>项目</a> <a href="/personal-dev-website/about" data-astro-cid-sz7xmlte>关于</a> <a href="/personal-dev-website/login" data-astro-cid-sz7xmlte>写笔记（登录）</a> </div> <div class="footer-col" data-astro-cid-sz7xmlte> <h4 data-astro-cid-sz7xmlte>连接</h4> <a href="https://github.com" target="_blank" rel="noopener noreferrer" data-astro-cid-sz7xmlte>GitHub</a> <a href="mailto:hello@example.com" data-astro-cid-sz7xmlte>Email</a> <a href="/personal-dev-website/resume.pdf" download="赵海蓺-简历.pdf" data-astro-cid-sz7xmlte>下载简历</a> <a href="/personal-dev-website/rss.xml" data-astro-cid-sz7xmlte>RSS</a> </div> </div> </div> <div class="footer-bottom container" data-astro-cid-sz7xmlte> <span data-astro-cid-sz7xmlte>© 2026 Zhao Haiyi. Personal Soft.</span> <span data-astro-cid-sz7xmlte>Built with Astro</span> </div> </footer>  </body></html> 

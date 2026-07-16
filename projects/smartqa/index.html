@@ -1,0 +1,109 @@
+<!DOCTYPE html><html lang="zh-CN"> <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="自然语言查询电商数据：意图识别、NL2SQL、RAG 兜底与图表可视化。前端 + API 均已部署。"><meta name="generator" content="Astro v4.16.19"><link rel="icon" type="image/svg+xml" href="/personal-dev-website/favicon.svg"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+SC:wght@400;500;600;700&family=Noto+Serif+SC:wght@500;600;700&display=swap" rel="stylesheet"><meta name="astro-view-transitions-enabled" content="true"><meta name="astro-view-transitions-fallback" content="animate"><title>智能问数 SmartQA · 赵海蓺</title><link rel="stylesheet" href="/personal-dev-website/_astro/about.BCqFscY2.css">
+<link rel="stylesheet" href="/personal-dev-website/_astro/_slug_.CyPI4uG6.css"><script type="module" src="/personal-dev-website/_astro/hoisted.BScVxmeO.js"></script><style>[data-astro-transition-scope="astro-xcoijgkp-1"] { view-transition-name: astro-xcoijgkp-1; }@layer astro { ::view-transition-old(astro-xcoijgkp-1) { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeOut; }::view-transition-new(astro-xcoijgkp-1) { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeIn; }[data-astro-transition=back]::view-transition-old(astro-xcoijgkp-1) { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeOut; }[data-astro-transition=back]::view-transition-new(astro-xcoijgkp-1) { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeIn; } }[data-astro-transition-fallback="old"] [data-astro-transition-scope="astro-xcoijgkp-1"],
+			[data-astro-transition-fallback="old"][data-astro-transition-scope="astro-xcoijgkp-1"] { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeOut; }[data-astro-transition-fallback="new"] [data-astro-transition-scope="astro-xcoijgkp-1"],
+			[data-astro-transition-fallback="new"][data-astro-transition-scope="astro-xcoijgkp-1"] { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeIn; }[data-astro-transition=back][data-astro-transition-fallback="old"] [data-astro-transition-scope="astro-xcoijgkp-1"],
+			[data-astro-transition=back][data-astro-transition-fallback="old"][data-astro-transition-scope="astro-xcoijgkp-1"] { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeOut; }[data-astro-transition=back][data-astro-transition-fallback="new"] [data-astro-transition-scope="astro-xcoijgkp-1"],
+			[data-astro-transition=back][data-astro-transition-fallback="new"][data-astro-transition-scope="astro-xcoijgkp-1"] { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeIn; }</style></head> <body> <div class="atmosphere" aria-hidden="true" data-atmosphere data-astro-cid-p7ciunqv> <div class="orb orb-a" data-depth="0.12" data-astro-cid-p7ciunqv></div> <div class="orb orb-b" data-depth="0.2" data-astro-cid-p7ciunqv></div> <div class="orb orb-c" data-depth="0.08" data-astro-cid-p7ciunqv></div> <svg class="art art-left" data-depth="0.15" viewBox="0 0 280 420" fill="none" xmlns="http://www.w3.org/2000/svg" data-astro-cid-p7ciunqv> <path d="M40 380 C60 300 40 240 90 180 C130 130 100 90 120 40" stroke="rgba(15,159,138,0.22)" stroke-width="1.5" data-astro-cid-p7ciunqv></path> <path d="M90 180 C120 200 160 190 190 150" stroke="rgba(91,77,255,0.16)" stroke-width="1.2" data-astro-cid-p7ciunqv></path> <ellipse cx="120" cy="48" rx="28" ry="14" transform="rotate(-28 120 48)" fill="rgba(15,159,138,0.14)" data-astro-cid-p7ciunqv></ellipse> <ellipse cx="148" cy="72" rx="22" ry="11" transform="rotate(18 148 72)" fill="rgba(91,77,255,0.12)" data-astro-cid-p7ciunqv></ellipse> <ellipse cx="98" cy="88" rx="18" ry="9" transform="rotate(-12 98 88)" fill="rgba(244,114,182,0.1)" data-astro-cid-p7ciunqv></ellipse> <circle cx="190" cy="150" r="6" fill="rgba(245,158,11,0.25)" data-astro-cid-p7ciunqv></circle> <circle cx="206" cy="138" r="3.5" fill="rgba(91,77,255,0.2)" data-astro-cid-p7ciunqv></circle> <path d="M70 260 C95 245 110 270 95 290 C80 305 60 285 70 260Z" fill="rgba(15,159,138,0.1)" data-astro-cid-p7ciunqv></path> <path d="M100 220 C125 205 145 230 125 250 C110 262 90 240 100 220Z" fill="rgba(91,77,255,0.08)" data-astro-cid-p7ciunqv></path> </svg> <svg class="art art-right" data-depth="0.18" viewBox="0 0 300 460" fill="none" xmlns="http://www.w3.org/2000/svg" data-astro-cid-p7ciunqv> <path d="M220 40 C200 120 240 170 200 240 C170 290 210 330 190 400" stroke="rgba(91,77,255,0.14)" stroke-width="1.4" data-astro-cid-p7ciunqv></path> <path d="M200 240 C160 230 140 260 155 285" stroke="rgba(15,159,138,0.16)" stroke-width="1.1" data-astro-cid-p7ciunqv></path> <ellipse cx="188" cy="402" rx="32" ry="15" transform="rotate(24 188 402)" fill="rgba(244,114,182,0.1)" data-astro-cid-p7ciunqv></ellipse> <ellipse cx="160" cy="378" rx="24" ry="12" transform="rotate(-20 160 378)" fill="rgba(91,77,255,0.1)" data-astro-cid-p7ciunqv></ellipse> <ellipse cx="210" cy="370" rx="20" ry="10" transform="rotate(8 210 370)" fill="rgba(15,159,138,0.12)" data-astro-cid-p7ciunqv></ellipse> <circle cx="155" cy="285" r="5" fill="rgba(245,158,11,0.22)" data-astro-cid-p7ciunqv></circle> <path d="M230 120 C250 100 275 125 255 150 C240 165 215 145 230 120Z" fill="rgba(91,77,255,0.09)" data-astro-cid-p7ciunqv></path> <path d="M250 180 C270 165 290 190 270 210 C255 222 235 200 250 180Z" fill="rgba(15,159,138,0.09)" data-astro-cid-p7ciunqv></path> </svg> <svg class="art art-mid" data-depth="0.06" viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg" data-astro-cid-p7ciunqv> <path d="M10 80 C40 40 70 100 100 50 C130 10 160 70 190 40" stroke="rgba(12,11,16,0.05)" stroke-width="1" stroke-dasharray="3 6" data-astro-cid-p7ciunqv></path> </svg> </div>  <script>
+  (function () {
+    function bindAtmosphere() {
+      var root = document.querySelector('[data-atmosphere]');
+      if (!root || root.dataset.bound === '1') return;
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      root.dataset.bound = '1';
+      var layers = root.querySelectorAll('[data-depth]');
+      var ticking = false;
+      var onScroll = function () {
+        if (ticking) return;
+        ticking = true;
+        requestAnimationFrame(function () {
+          var y = window.scrollY || 0;
+          layers.forEach(function (el) {
+            var depth = Number(el.getAttribute('data-depth') || 0.1);
+            var shift = y * depth;
+            if (el.classList.contains('art-mid')) {
+              el.style.transform = 'translateX(-50%) translate3d(0,' + shift + 'px,0)';
+            } else {
+              el.style.transform = 'translate3d(0,' + shift + 'px,0)';
+            }
+          });
+          ticking = false;
+        });
+      };
+      onScroll();
+      window.addEventListener('scroll', onScroll, { passive: true });
+    }
+    bindAtmosphere();
+    document.addEventListener('astro:page-load', function () {
+      var root = document.querySelector('[data-atmosphere]');
+      if (root) root.dataset.bound = '';
+      bindAtmosphere();
+    });
+  })();
+</script> <header class="site-header" data-header data-astro-cid-3ef6ksr2> <div class="header-inner container" data-astro-cid-3ef6ksr2> <a class="logo" href="/personal-dev-website/" data-astro-cid-3ef6ksr2> <span class="logo-mark" aria-hidden="true" data-astro-cid-3ef6ksr2> <svg viewBox="0 0 36 36" width="34" height="34" fill="none" data-astro-cid-3ef6ksr2> <circle cx="18" cy="18" r="16.5" stroke="currentColor" stroke-width="1.2" opacity="0.35" data-astro-cid-3ef6ksr2></circle> <circle cx="18" cy="18" r="12" fill="rgba(243,241,234,0.65)" data-astro-cid-3ef6ksr2></circle> <text x="18" y="22.5" text-anchor="middle" font-family="Noto Serif SC, Songti SC, serif" font-size="14" font-weight="600" fill="currentColor" data-astro-cid-3ef6ksr2>艺</text> </svg> </span> <span class="logo-text" data-astro-cid-3ef6ksr2>赵海蓺</span> </a> <nav class="nav desktop-nav" aria-label="主导航" data-astro-cid-3ef6ksr2> <a href="/personal-dev-website/" data-astro-cid-3ef6ksr2> 首页 </a><a href="/personal-dev-website/notes" data-astro-cid-3ef6ksr2> 笔记 </a><a href="/personal-dev-website/projects" class="is-active" aria-current="page" data-astro-cid-3ef6ksr2> 项目 </a><a href="/personal-dev-website/about" data-astro-cid-3ef6ksr2> 关于 </a> <a class="btn btn-dark btn-sm nav-cta" href="/personal-dev-website/resume.pdf" download="赵海蓺-简历.pdf" data-astro-cid-3ef6ksr2>下载简历</a> </nav> <div class="header-right-mobile" data-astro-cid-3ef6ksr2> <a class="btn btn-dark btn-sm resume-m" href="/personal-dev-website/resume.pdf" download="赵海蓺-简历.pdf" data-astro-cid-3ef6ksr2>简历</a> <button class="menu-toggle" type="button" aria-label="打开菜单" aria-expanded="false" data-menu-toggle data-astro-cid-3ef6ksr2> <span data-astro-cid-3ef6ksr2></span><span data-astro-cid-3ef6ksr2></span><span data-astro-cid-3ef6ksr2></span> </button> </div> </div> <nav class="mobile-nav" aria-label="移动导航" data-mobile-nav hidden data-astro-cid-3ef6ksr2> <a href="/personal-dev-website/" data-astro-cid-3ef6ksr2> 首页 </a><a href="/personal-dev-website/notes" data-astro-cid-3ef6ksr2> 笔记 </a><a href="/personal-dev-website/projects" class="is-active" data-astro-cid-3ef6ksr2> 项目 </a><a href="/personal-dev-website/about" data-astro-cid-3ef6ksr2> 关于 </a> <a href="/personal-dev-website/resume.pdf" download="赵海蓺-简历.pdf" data-astro-cid-3ef6ksr2>下载简历</a> <a href="/personal-dev-website/login" data-auth-link data-astro-cid-3ef6ksr2>登录写笔记</a> </nav> </header>  <script>
+  (function () {
+    function bindHeader() {
+      var header = document.querySelector('[data-header]');
+      var toggle = document.querySelector('[data-menu-toggle]');
+      var mobile = document.querySelector('[data-mobile-nav]');
+      if (!header || header.dataset.bound === '1') return;
+      header.dataset.bound = '1';
+      var onScroll = function () {
+        header.classList.toggle('is-solid', window.scrollY > 8);
+      };
+      onScroll();
+      window.addEventListener('scroll', onScroll, { passive: true });
+      if (toggle && mobile) {
+        toggle.addEventListener('click', function () {
+          var open = mobile.classList.toggle('is-open');
+          mobile.hidden = !open;
+          toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+        });
+      }
+    }
+    bindHeader();
+    document.addEventListener('astro:page-load', function () {
+      var header = document.querySelector('[data-header]');
+      if (header) header.dataset.bound = '';
+      bindHeader();
+    });
+  })();
+</script> <main class="page-enter" data-astro-transition-scope="astro-xcoijgkp-1">  <main class="container page" data-astro-cid-ovxcmftc> <div class="hero" data-astro-cid-ovxcmftc> <div data-astro-cid-ovxcmftc> <div class="crumb" data-astro-cid-ovxcmftc> <a href="/personal-dev-website/projects" data-astro-cid-ovxcmftc>项目</a> <span data-astro-cid-ovxcmftc>/</span> <span data-astro-cid-ovxcmftc>smartqa</span> </div> <div class="badge-row" data-astro-cid-ovxcmftc> <span class="live-dot" data-astro-cid-ovxcmftc><i data-astro-cid-ovxcmftc></i> Live on 1.14.106.17</span>  <span class="tag" data-astro-cid-ovxcmftc>Vue 3</span><span class="tag" data-astro-cid-ovxcmftc>NL2SQL</span> <span class="tag" data-astro-cid-ovxcmftc>2026</span> </div> <h1 class="serif" data-astro-cid-ovxcmftc>智能问数 SmartQA</h1> <p class="lead" data-astro-cid-ovxcmftc>自然语言查询电商数据：意图识别、NL2SQL、RAG 兜底与图表可视化。前端 + API 均已部署。</p> <div class="actions" data-astro-cid-ovxcmftc> <a class="btn btn-preview teal" href="http://1.14.106.17:18080/" target="_blank" rel="noopener noreferrer" data-astro-cid-ovxcmftc> <span class="play" aria-hidden="true" data-astro-cid-ovxcmftc>▶</span> 预览项目
+</a>  <a class="btn btn-soft" href="/personal-dev-website/notes/nl2sql-rag-layers" data-astro-cid-ovxcmftc>
+相关笔记
+</a> <a class="btn btn-light" href="/personal-dev-website/projects" data-astro-cid-ovxcmftc>返回列表</a> </div> </div> <aside class="deploy-panel" aria-label="在线部署与预览" data-astro-cid-ovxcmftc> <div class="head teal" data-astro-cid-ovxcmftc> <div class="k" data-astro-cid-ovxcmftc>ONLINE DEPLOYMENT</div> <h2 class="serif" data-astro-cid-ovxcmftc>在线预览入口</h2> <p data-astro-cid-ovxcmftc>服务器 IP · 1.14.106.17 · 新标签打开</p> </div> <div class="body" data-astro-cid-ovxcmftc> <div class="svc" data-astro-cid-ovxcmftc> <div class="svc-item" data-astro-cid-ovxcmftc> <div class="row1" data-astro-cid-ovxcmftc> <span class="name" data-astro-cid-ovxcmftc>前端</span> <span class="port" data-astro-cid-ovxcmftc>:18080</span> </div> <a href="http://1.14.106.17:18080/" target="_blank" rel="noopener noreferrer" data-astro-cid-ovxcmftc> http://1.14.106.17:18080/ </a> </div><div class="svc-item" data-astro-cid-ovxcmftc> <div class="row1" data-astro-cid-ovxcmftc> <span class="name" data-astro-cid-ovxcmftc>后端 API</span> <span class="port" data-astro-cid-ovxcmftc>:18000</span> </div> <a href="http://1.14.106.17:18000/api/health" target="_blank" rel="noopener noreferrer" data-astro-cid-ovxcmftc> http://1.14.106.17:18000/api/health </a> </div> </div> <div class="deploy-cta" data-astro-cid-ovxcmftc> <a class="btn btn-preview teal" href="http://1.14.106.17:18080/" target="_blank" rel="noopener noreferrer" data-astro-cid-ovxcmftc> <span class="play" aria-hidden="true" data-astro-cid-ovxcmftc>▶</span> 预览项目
+</a> </div> </div> </aside> </div> <div class="preview-band" data-astro-cid-ovxcmftc> <div data-astro-cid-ovxcmftc> <h3 class="serif" data-astro-cid-ovxcmftc>想直接看线上效果？</h3> <p data-astro-cid-ovxcmftc>主按钮将在新标签打开服务器部署实例。</p> </div> <a class="btn btn-preview teal" href="http://1.14.106.17:18080/" target="_blank" rel="noopener noreferrer" data-astro-cid-ovxcmftc> <span class="play" aria-hidden="true" data-astro-cid-ovxcmftc>▶</span> 预览项目
+</a> </div> <div class="content" data-astro-cid-ovxcmftc> <section class="block" data-astro-cid-ovxcmftc> <h2 class="serif" data-astro-cid-ovxcmftc>01 · 问题背景</h2> <p data-astro-cid-ovxcmftc>业务同学需要用自然语言查询结构化数据，但直接 NL2SQL 容易因 schema 理解不足、脏数据与失败重试策略不当而不稳定。</p> </section> <section class="block" data-astro-cid-ovxcmftc> <h2 class="serif" data-astro-cid-ovxcmftc>02 · 解决方案</h2> <p data-astro-cid-ovxcmftc>Pipeline（意图 → 上下文 → RAG → NL2SQL → 执行/自纠错）与 Agent（ReAct + tools）双路径，失败时可回退检索增强，并可视化结果。</p> <pre class="arch" data-astro-cid-ovxcmftc>部署主机：1.14.106.17
+前端 :18080 → http://1.14.106.17:18080/
+后端 API :18000 → http://1.14.106.17:18000/api/health</pre> </section> <section class="block" data-astro-cid-ovxcmftc> <h2 class="serif" data-astro-cid-ovxcmftc>03 · 我的贡献</h2> <ul data-astro-cid-ovxcmftc> <li data-astro-cid-ovxcmftc>实现 NL2SQL 主路径与 RAG 兜底。</li><li data-astro-cid-ovxcmftc>Vue 3 前端 + Chart 可视化联调。</li><li data-astro-cid-ovxcmftc>部署前后端并提供公开预览入口。</li> </ul> </section> <section class="block" data-astro-cid-ovxcmftc> <h2 class="serif" data-astro-cid-ovxcmftc>04 · 技术栈</h2> <div class="tags" data-astro-cid-ovxcmftc> <span class="tag" data-astro-cid-ovxcmftc>Vue 3</span><span class="tag" data-astro-cid-ovxcmftc>FastAPI</span><span class="tag" data-astro-cid-ovxcmftc>LangChain</span><span class="tag" data-astro-cid-ovxcmftc>NL2SQL</span><span class="tag" data-astro-cid-ovxcmftc>ChromaDB</span><span class="tag" data-astro-cid-ovxcmftc>Chart.js</span> </div> </section> <section class="block" data-astro-cid-ovxcmftc> <h2 class="serif" data-astro-cid-ovxcmftc>05 · 成果与部署</h2> <div class="hl" data-astro-cid-ovxcmftc> <div data-astro-cid-ovxcmftc> <strong data-astro-cid-ovxcmftc>双路径</strong> <span data-astro-cid-ovxcmftc>Pipeline + ReAct Agent 可切换</span> </div><div data-astro-cid-ovxcmftc> <strong data-astro-cid-ovxcmftc>可预览</strong> <span data-astro-cid-ovxcmftc>前端 18080 / API 18000 已上线</span> </div> <div data-astro-cid-ovxcmftc> <strong data-astro-cid-ovxcmftc> 前端 · :18080 </strong> <span data-astro-cid-ovxcmftc>http://1.14.106.17:18080/</span> </div><div data-astro-cid-ovxcmftc> <strong data-astro-cid-ovxcmftc> 后端 API · :18000 </strong> <span data-astro-cid-ovxcmftc>http://1.14.106.17:18000/api/health</span> </div> </div> </section> </div> </main>  </main> <footer class="site-footer" data-astro-cid-sz7xmlte> <div class="footer-inner container" data-astro-cid-sz7xmlte> <div data-astro-cid-sz7xmlte> <a class="logo" href="/personal-dev-website/" data-astro-cid-sz7xmlte> <span class="logo-mark" aria-hidden="true" data-astro-cid-sz7xmlte> <svg viewBox="0 0 36 36" width="28" height="28" fill="none" data-astro-cid-sz7xmlte> <circle cx="18" cy="18" r="16.5" stroke="currentColor" stroke-width="1.2" opacity="0.35" data-astro-cid-sz7xmlte></circle> <text x="18" y="22.5" text-anchor="middle" font-family="Noto Serif SC, Songti SC, serif" font-size="14" font-weight="600" fill="currentColor" data-astro-cid-sz7xmlte>艺</text> </svg> </span> <span class="logo-text" data-astro-cid-sz7xmlte>赵海蓺</span> </a> <p data-astro-cid-sz7xmlte>个人数字主页 · 笔记、项目与构建记录</p> </div> <div class="footer-cols" data-astro-cid-sz7xmlte> <div class="footer-col" data-astro-cid-sz7xmlte> <h4 data-astro-cid-sz7xmlte>导航</h4> <a href="/personal-dev-website/notes" data-astro-cid-sz7xmlte>笔记</a> <a href="/personal-dev-website/projects" data-astro-cid-sz7xmlte>项目</a> <a href="/personal-dev-website/about" data-astro-cid-sz7xmlte>关于</a> <a href="/personal-dev-website/login" data-astro-cid-sz7xmlte>写笔记（登录）</a> </div> <div class="footer-col" data-astro-cid-sz7xmlte> <h4 data-astro-cid-sz7xmlte>连接</h4> <a href="https://github.com" target="_blank" rel="noopener noreferrer" data-astro-cid-sz7xmlte>GitHub</a> <a href="mailto:hello@example.com" data-astro-cid-sz7xmlte>Email</a> <a href="/personal-dev-website/resume.pdf" download="赵海蓺-简历.pdf" data-astro-cid-sz7xmlte>下载简历</a> <a href="/personal-dev-website/rss.xml" data-astro-cid-sz7xmlte>RSS</a> </div> </div> </div> <div class="footer-bottom container" data-astro-cid-sz7xmlte> <span data-astro-cid-sz7xmlte>© 2026 Zhao Haiyi. Personal Soft.</span> <span data-astro-cid-sz7xmlte>Built with Astro</span> </div> </footer>  </body></html> 
