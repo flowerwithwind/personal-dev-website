@@ -1,10 +1,12 @@
 ---
+import { ViewTransitions } from 'astro:transitions';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import Atmosphere from '../components/Atmosphere.astro';
 import { siteConfig } from '../data/site';
 import { path } from '../lib/paths';
 import '../styles/global.css';
+import '../styles/transitions.css';
 
 interface Props {
   title?: string;
@@ -35,14 +37,15 @@ const fullTitle = title === siteConfig.title ? title : `${title} · ${siteConfig
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+SC:wght@400;500;600;700&family=Noto+Serif+SC:wght@500;600;700&display=swap"
       rel="stylesheet"
     />
+    <ViewTransitions />
     <title>{fullTitle}</title>
   </head>
   <body>
     <Atmosphere />
-    {!hideChrome && <Header current={current} />}
-    <main>
+    {!hideChrome && <Header current={current} transition:persist="site-header" />}
+    <main transition:animate="fade" class="page-enter">
       <slot />
     </main>
-    {!hideChrome && <Footer />}
+    {!hideChrome && <Footer transition:persist="site-footer" />}
   </body>
 </html>

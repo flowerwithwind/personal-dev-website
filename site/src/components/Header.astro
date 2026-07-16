@@ -188,20 +188,32 @@ const resumeHref = path(siteConfig.resumePath);
   }
 </style>
 
-<script>
-  const header = document.querySelector('[data-header]');
-  const toggle = document.querySelector('[data-menu-toggle]');
-  const mobile = document.querySelector('[data-mobile-nav]');
-
-  const onScroll = () => {
-    header?.classList.toggle('is-solid', window.scrollY > 8);
-  };
-  onScroll();
-  window.addEventListener('scroll', onScroll, { passive: true });
-
-  toggle?.addEventListener('click', () => {
-    const open = mobile?.classList.toggle('is-open');
-    if (mobile) mobile.hidden = !open;
-    toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
-  });
+<script is:inline>
+  (function () {
+    function bindHeader() {
+      var header = document.querySelector('[data-header]');
+      var toggle = document.querySelector('[data-menu-toggle]');
+      var mobile = document.querySelector('[data-mobile-nav]');
+      if (!header || header.dataset.bound === '1') return;
+      header.dataset.bound = '1';
+      var onScroll = function () {
+        header.classList.toggle('is-solid', window.scrollY > 8);
+      };
+      onScroll();
+      window.addEventListener('scroll', onScroll, { passive: true });
+      if (toggle && mobile) {
+        toggle.addEventListener('click', function () {
+          var open = mobile.classList.toggle('is-open');
+          mobile.hidden = !open;
+          toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+        });
+      }
+    }
+    bindHeader();
+    document.addEventListener('astro:page-load', function () {
+      var header = document.querySelector('[data-header]');
+      if (header) header.dataset.bound = '';
+      bindHeader();
+    });
+  })();
 </script>

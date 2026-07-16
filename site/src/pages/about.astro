@@ -34,18 +34,25 @@ const skills = [
 
 <BaseLayout current="about" title="关于" description={`关于${siteConfig.name}`}>
   <main class="container layout">
-    <aside class="profile">
-      <div class="avatar" aria-hidden="true">ZH</div>
+    <aside class="profile" data-animate="fade-up">
+      <div class="avatar" aria-hidden="true">
+        <svg viewBox="0 0 120 120" width="100%" height="100%" fill="none">
+          <circle cx="60" cy="60" r="56" stroke="currentColor" stroke-width="1.2" opacity="0.28"></circle>
+          <circle cx="60" cy="60" r="44" fill="rgba(243,241,234,0.9)"></circle>
+          <text x="60" y="72" text-anchor="middle" font-family="Noto Serif SC, Songti SC, serif" font-size="42" font-weight="600" fill="currentColor">艺</text>
+        </svg>
+      </div>
       <h1 class="serif">{siteConfig.name}</h1>
       <p class="role">写笔记的构建者 · AI Systems</p>
       <div class="links">
         <a href={siteConfig.github} target="_blank" rel="noopener noreferrer"><span>GitHub</span><span>↗</span></a>
         <a href={`mailto:${siteConfig.email}`}><span>Email</span><span>↗</span></a>
+        <a href={path(siteConfig.resumePath)} download="赵海蓺-简历.pdf"><span>下载简历</span><span>↓</span></a>
         <a href={path('/rss.xml')}><span>RSS</span><span>↗</span></a>
       </div>
     </aside>
 
-    <div>
+    <div data-animate-stagger>
       <section class="block">
         <h2 class="serif">你好</h2>
         <p>
@@ -124,17 +131,21 @@ const skills = [
   .avatar {
     width: 100%;
     aspect-ratio: 1;
-    border-radius: 18px;
+    border-radius: 20px;
     margin-bottom: 16px;
     display: grid;
     place-items: center;
-    font-family: var(--font-serif);
-    font-size: 42px;
-    font-weight: 700;
-    color: #fff;
+    color: #3d3a4a;
     background:
-      radial-gradient(circle at 30% 25%, rgba(255, 255, 255, 0.28), transparent 40%),
-      linear-gradient(145deg, #8b7cff, #5b4dff 50%, #14b8a6);
+      radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.75), transparent 50%),
+      linear-gradient(160deg, #efece3 0%, #e7e2d6 55%, #ddd6c8 100%);
+    border: 1px solid rgba(12, 11, 16, 0.06);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+    overflow: hidden;
+  }
+  .avatar svg {
+    width: 72%;
+    height: 72%;
   }
   .profile h1 {
     font-size: 26px;

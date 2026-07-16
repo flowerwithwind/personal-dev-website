@@ -2,10 +2,13 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { siteConfig } from '../data/site';
 import { path } from '../lib/paths';
+const expectedHash = siteConfig.adminPasswordSha256;
+const adminPath = path('/admin');
+const homePath = path('/');
 ---
 
 <BaseLayout current="login" title="登录" description="作者登录后可添加笔记">
-  <div class="container wrap">
+  <div class="container wrap" data-animate="fade-up">
     <div class="card">
       <p class="kicker"><i></i> 作者入口</p>
       <h1 class="serif">登录后写笔记</h1>
@@ -13,51 +16,110 @@ import { path } from '../lib/paths';
         仅站主可发布笔记。验证通过后会在本机浏览器保持登录一段时间，然后进入写笔记面板。
       </p>
 
-      <form class="form" data-login-form>
+      <form class="form" id="login-form" data-expected-hash={expectedHash} data-admin-path={adminPath}>
         <label>
           <span>密码</span>
-          <input type="password" name="password" autocomplete="current-password" required placeholder="输入作者密码" />
+          <input
+            type="password"
+            name="password"
+            id="login-password"
+            autocomplete="current-password"
+            required
+            placeholder="输入作者密码"
+          />
         </label>
-        <p class="err" data-login-error hidden>密码不正确，请重试。</p>
-        <button class="btn btn-dark" type="submit">登录</button>
+        <p class="err" id="login-error" hidden></p>
+        <button class="btn btn-dark" type="submit" id="login-submit">登录</button>
       </form>
 
       <p class="hint">
-        默认演示密码见站点 README。生产环境请修改 <code>siteConfig.adminPasswordSha256</code>。
-        笔记保存在你的浏览器本地（可导出 Markdown 纳入仓库）。
+        默认演示密码：<code>haiyi2026</code>。修改请更新
+        <code>siteConfig.adminPasswordSha256</code>。
+        笔记默认存 IndexedDB（本机），可导出 Markdown。
       </p>
-      <a class="back" href={path('/')}>← 返回首页</a>
+      <a class="back" href={homePath}>← 返回首页</a>
     </div>
   </div>
 </BaseLayout>
 
-<script define:vars={{ expectedHash: siteConfig.adminPasswordSha256, adminPath: path('/admin') }}>
-  import {
-    verifyPassword,
-    writeSession,
-    readSession,
-  } from '../lib/auth.ts';
+<script is:inline>
+  (function () {
+    function boot() {
+      var form = document.getElementById('login-form');
+      if (!form || form.dataset.bound === '1') return;
+      form.dataset.bound = '1';
 
-  if (readSession()) {
-    location.replace(adminPath);
-  }
+      var expectedHash = (form.getAttribute('data-expected-hash') || '').trim().toLowerCase();
+      var adminPath = form.getAttribute('data-admin-path') || '/admin';
+      var err = document.getElementById('login-error');
+      var AUTH_KEY = 'personal-site-auth-v1';
 
-  const form = document.querySelector('[data-login-form]');
-  const err = document.querySelector('[data-login-error]');
+      function showError(msg) {
+        if (!err) return;
+        err.hidden = false;
+        err.textContent = msg;
+      }
 
-  form?.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    err?.setAttribute('hidden', '');
-    const fd = new FormData(form);
-    const password = String(fd.get('password') || '');
-    const ok = await verifyPassword(password, expectedHash);
-    if (!ok) {
-      err?.removeAttribute('hidden');
-      return;
+      function readSession() {
+        try {
+          var raw = sessionStorage.getItem(AUTH_KEY);
+          if (!raw) return null;
+          var parsed = JSON.parse(raw);
+          if (!parsed || !parsed.ok || typeof parsed.at !== 'number') return null;
+          if (Date.now() - parsed.at > 12 * 3600 * 1000) {
+            sessionStorage.removeItem(AUTH_KEY);
+            return null;
+          }
+          return parsed;
+        } catch (e) {
+          return null;
+        }
+      }
+
+      if (readSession()) {
+        location.replace(adminPath);
+        return;
+      }
+
+      async function sha256Hex(text) {
+        if (!window.crypto || !window.crypto.subtle) {
+          throw new Error('当前浏览器不支持安全登录（请使用 HTTPS 或 localhost）');
+        }
+        var data = new TextEncoder().encode(text);
+        var buf = await crypto.subtle.digest('SHA-256', data);
+        return Array.from(new Uint8Array(buf))
+          .map(function (b) {
+            return b.toString(16).padStart(2, '0');
+          })
+          .join('');
+      }
+
+      form.addEventListener('submit', async function (e) {
+        e.preventDefault();
+        if (err) err.hidden = true;
+        var input = document.getElementById('login-password');
+        var password = (input && input.value ? input.value : '').trim();
+        if (!password) {
+          showError('请输入密码');
+          return;
+        }
+        try {
+          var got = await sha256Hex(password);
+          if (got !== expectedHash) {
+            showError('密码不正确，请重试。');
+            return;
+          }
+          sessionStorage.setItem(AUTH_KEY, JSON.stringify({ ok: true, at: Date.now() }));
+          location.href = adminPath;
+        } catch (ex) {
+          showError(ex && ex.message ? ex.message : '登录失败，请重试');
+        }
+      });
     }
-    writeSession();
-    location.href = adminPath;
-  });
+
+    boot();
+    document.addEventListener('astro:page-load', boot);
+  })();
 </script>
 
 <style>

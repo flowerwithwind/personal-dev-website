@@ -12,7 +12,7 @@ const projectCards = getAllProjects();
 ---
 
 <BaseLayout current="home" title={siteConfig.title}>
-  <section class="hero container">
+  <section class="hero container" data-animate="fade-up">
     <div class="kicker"><i></i> 个人网站 · 公开思考与构建记录</div>
     <h1 class="serif">
       写一点笔记，
@@ -33,9 +33,9 @@ const projectCards = getAllProjects();
     </div>
   </section>
 
-  <section class="now container" aria-label="Now">
+  <section class="now container" aria-label="Now" data-animate="fade-up">
     <h2 class="serif">Now</h2>
-    <div class="now-grid">
+    <div class="now-grid" data-animate-stagger>
       {
         nowItems.map((item) => (
           <div class="now-item">
@@ -56,7 +56,7 @@ const projectCards = getAllProjects();
         </div>
         <a class="more" href={path('/notes')}>全部笔记 →</a>
       </div>
-      <div class="notes-grid">
+      <div class="notes-grid" data-animate-stagger>
         {featuredNote && <NoteCard note={featuredNote} large />}
         {restNotes.map((n) => <NoteCard note={n} />)}
       </div>
@@ -72,7 +72,7 @@ const projectCards = getAllProjects();
         </div>
         <a class="more" href={path('/projects')}>全部项目 →</a>
       </div>
-      <div class="projects-grid">
+      <div class="projects-grid" data-animate-stagger>
         {
           projectCards.map((p) => (
             <a class:list={['mini-project', p.coverTone]} href={path(`/projects/${p.slug}`)}>

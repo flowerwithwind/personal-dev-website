@@ -1,0 +1,49 @@
+/* Page + content enter animations (works with View Transitions) */
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.28s;
+}
+
+main {
+  view-transition-name: main-content;
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.page-enter,
+[data-animate='fade-up'] {
+  animation: fade-up 0.45s ease both;
+}
+
+[data-animate-stagger] > * {
+  animation: fade-up 0.5s ease both;
+}
+
+[data-animate-stagger] > *:nth-child(1) { animation-delay: 0.02s; }
+[data-animate-stagger] > *:nth-child(2) { animation-delay: 0.07s; }
+[data-animate-stagger] > *:nth-child(3) { animation-delay: 0.12s; }
+[data-animate-stagger] > *:nth-child(4) { animation-delay: 0.17s; }
+[data-animate-stagger] > *:nth-child(5) { animation-delay: 0.22s; }
+[data-animate-stagger] > *:nth-child(6) { animation-delay: 0.27s; }
+[data-animate-stagger] > *:nth-child(7) { animation-delay: 0.32s; }
+[data-animate-stagger] > *:nth-child(8) { animation-delay: 0.37s; }
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root),
+  ::view-transition-new(root),
+  .page-enter,
+  [data-animate='fade-up'],
+  [data-animate-stagger] > * {
+    animation: none !important;
+  }
+}

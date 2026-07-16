@@ -10,7 +10,7 @@ const chips = getNoteFilterChips();
 
 <BaseLayout current="notes" title="笔记" description="公开的思考与实验记录 · Digital Garden">
   <div class="container page">
-    <header class="page-hero">
+    <header class="page-hero" data-animate="fade-up">
       <div class="hero-row">
         <div>
           <h1 class="serif">笔记</h1>
@@ -18,11 +18,11 @@ const chips = getNoteFilterChips();
             公开的思考与实验记录。有些是完整文章，有些仍会继续修改——更接近 digital garden，而不是新闻博客。
           </p>
         </div>
-        <a class="btn btn-dark btn-sm write-btn" href={path('/login')} data-write-note-btn>写笔记</a>
+        <a class="btn btn-dark btn-sm write-btn" href={path('/login')} id="write-note-btn">写笔记</a>
       </div>
     </header>
 
-    <div class="filters" role="toolbar" aria-label="笔记筛选" data-note-filters>
+    <div class="filters" role="toolbar" aria-label="笔记筛选" id="note-filters" data-animate="fade-up">
       {
         chips.map((chip, i) => (
           <button type="button" class:list={['chip', { 'is-active': i === 0 }]} data-filter={chip}>
@@ -32,7 +32,14 @@ const chips = getNoteFilterChips();
       }
     </div>
 
-    <div class="list" data-note-list data-local-base={path('/notes/local/')} data-admin-path={path('/admin')} data-login-path={path('/login')}>
+    <div
+      class="list"
+      id="note-list"
+      data-animate-stagger
+      data-local-base={path('/notes/local/')}
+      data-admin-path={path('/admin')}
+      data-login-path={path('/login')}
+    >
       {
         notes.map((note) => (
           <a
@@ -78,9 +85,6 @@ const chips = getNoteFilterChips();
     color: var(--muted);
     font-weight: 500;
     max-width: 560px;
-  }
-  .write-btn {
-    flex: 0 0 auto;
   }
   .filters {
     display: flex;
@@ -143,49 +147,142 @@ const chips = getNoteFilterChips();
   }
 </style>
 
-<script>
-  import { readSession, readUserNotes } from '../../lib/auth.ts';
+<script is:inline>
+  (function () {
+    var AUTH_KEY = 'personal-site-auth-v1';
+    var LS_KEY = 'personal-site-user-notes-v1';
+    var DB_NAME = 'personal-site-notes-db';
+    var STORE = 'notes';
 
-  const toolbar = document.querySelector('[data-note-filters]');
-  const list = document.querySelector<HTMLElement>('[data-note-list]');
-  const writeBtn = document.querySelector<HTMLAnchorElement>('[data-write-note-btn]');
-  const localBase = list?.dataset.localBase || '/notes/local/';
-  const adminPath = list?.dataset.adminPath || '/admin';
-  const loginPath = list?.dataset.loginPath || '/login';
+    function readSession() {
+      try {
+        var raw = sessionStorage.getItem(AUTH_KEY);
+        if (!raw) return null;
+        var parsed = JSON.parse(raw);
+        if (!parsed || !parsed.ok) return null;
+        if (Date.now() - parsed.at > 12 * 3600 * 1000) return null;
+        return parsed;
+      } catch (e) {
+        return null;
+      }
+    }
 
-  if (writeBtn) {
-    writeBtn.href = readSession() ? adminPath : loginPath;
-    writeBtn.textContent = readSession() ? '写笔记' : '登录写笔记';
-  }
-
-  if (list) {
-    const userNotes = readUserNotes();
-    userNotes.forEach((n) => {
-      const a = document.createElement('a');
-      a.className = 'item item-user';
-      a.href = `${localBase}?slug=${encodeURIComponent(n.slug)}`;
-      a.dataset.tags = [...n.filters, ...n.tags, n.categoryLabel, '本机'].join('|');
-      a.innerHTML = `<div><div class="cat">本机 · ${escapeHtml(n.categoryLabel)}</div><h2 class="serif">${escapeHtml(n.title)}</h2><p>${escapeHtml(n.summary)}</p></div><div class="date">${n.status === 'growing' ? '持续更新' : n.publishedAt}</div>`;
-      list.prepend(a);
-    });
-  }
-
-  function escapeHtml(s: string) {
-    return s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c] as string);
-  }
-
-  if (toolbar && list) {
-    toolbar.addEventListener('click', (e) => {
-      const btn = (e.target as HTMLElement).closest<HTMLButtonElement>('[data-filter]');
-      if (!btn) return;
-      toolbar.querySelectorAll('.chip').forEach((c) => c.classList.remove('is-active'));
-      btn.classList.add('is-active');
-      const key = btn.dataset.filter || '全部';
-      list.querySelectorAll<HTMLElement>('.item').forEach((item) => {
-        const tags = item.dataset.tags || '';
-        const show = key === '全部' || tags.split('|').some((t) => t.includes(key) || key.includes(t));
-        item.style.display = show ? '' : 'none';
+    function openDb() {
+      return new Promise(function (resolve, reject) {
+        if (!window.indexedDB) return reject(new Error('no idb'));
+        var req = indexedDB.open(DB_NAME, 1);
+        req.onupgradeneeded = function () {
+          var db = req.result;
+          if (!db.objectStoreNames.contains(STORE)) db.createObjectStore(STORE, { keyPath: 'slug' });
+        };
+        req.onsuccess = function () {
+          resolve(req.result);
+        };
+        req.onerror = function () {
+          reject(req.error);
+        };
       });
+    }
+
+    async function readNotes() {
+      try {
+        var db = await openDb();
+        var list = await new Promise(function (resolve, reject) {
+          var tx = db.transaction(STORE, 'readonly');
+          var req = tx.objectStore(STORE).getAll();
+          req.onsuccess = function () {
+            resolve(req.result || []);
+          };
+          req.onerror = function () {
+            reject(req.error);
+          };
+        });
+        if (list.length) return list;
+      } catch (e) {}
+      try {
+        var raw = localStorage.getItem(LS_KEY);
+        return raw ? JSON.parse(raw) : [];
+      } catch (e2) {
+        return [];
+      }
+    }
+
+    function escapeHtml(s) {
+      return String(s).replace(/[&<>"']/g, function (c) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+      });
+    }
+
+    async function boot() {
+      var list = document.getElementById('note-list');
+      var writeBtn = document.getElementById('write-note-btn');
+      var toolbar = document.getElementById('note-filters');
+      if (!list) return;
+      if (list.dataset.hydrated === '1') return;
+      list.dataset.hydrated = '1';
+
+      var localBase = list.getAttribute('data-local-base') || '/notes/local/';
+      var adminPath = list.getAttribute('data-admin-path') || '/admin';
+      var loginPath = list.getAttribute('data-login-path') || '/login';
+
+      if (writeBtn) {
+        if (readSession()) {
+          writeBtn.href = adminPath;
+          writeBtn.textContent = '写笔记';
+        } else {
+          writeBtn.href = loginPath;
+          writeBtn.textContent = '登录写笔记';
+        }
+      }
+
+      var userNotes = await readNotes();
+      userNotes.forEach(function (n) {
+        var a = document.createElement('a');
+        a.className = 'item item-user';
+        a.href = localBase + '?slug=' + encodeURIComponent(n.slug);
+        a.dataset.tags = []
+          .concat(n.filters || [], n.tags || [], [n.categoryLabel || '', '本机'])
+          .join('|');
+        a.innerHTML =
+          '<div><div class="cat">本机 · ' +
+          escapeHtml(n.categoryLabel || '随笔') +
+          '</div><h2 class="serif">' +
+          escapeHtml(n.title) +
+          '</h2><p>' +
+          escapeHtml(n.summary || '') +
+          '</p></div><div class="date">' +
+          (n.status === 'growing' ? '持续更新' : escapeHtml(n.publishedAt || '')) +
+          '</div>';
+        list.prepend(a);
+      });
+
+      if (toolbar) {
+        toolbar.addEventListener('click', function (e) {
+          var btn = e.target.closest('[data-filter]');
+          if (!btn) return;
+          toolbar.querySelectorAll('.chip').forEach(function (c) {
+            c.classList.remove('is-active');
+          });
+          btn.classList.add('is-active');
+          var key = btn.getAttribute('data-filter') || '全部';
+          list.querySelectorAll('.item').forEach(function (item) {
+            var tags = item.getAttribute('data-tags') || '';
+            var show =
+              key === '全部' ||
+              tags.split('|').some(function (t) {
+                return t.indexOf(key) >= 0 || key.indexOf(t) >= 0;
+              });
+            item.style.display = show ? '' : 'none';
+          });
+        });
+      }
+    }
+
+    document.addEventListener('astro:page-load', function () {
+      var list = document.getElementById('note-list');
+      if (list) list.dataset.hydrated = '';
+      boot();
     });
-  }
+    boot();
+  })();
 </script>

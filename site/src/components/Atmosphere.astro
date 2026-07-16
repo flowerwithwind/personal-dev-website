@@ -104,29 +104,40 @@
   }
 </style>
 
-<script>
-  const root = document.querySelector('[data-atmosphere]');
-  if (root && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    const layers = root.querySelectorAll<HTMLElement>('[data-depth]');
-    let ticking = false;
-    const onScroll = () => {
-      if (ticking) return;
-      ticking = true;
-      requestAnimationFrame(() => {
-        const y = window.scrollY || 0;
-        layers.forEach((el) => {
-          const depth = Number(el.dataset.depth || 0.1);
-          const shift = y * depth;
-          if (el.classList.contains('art-mid')) {
-            el.style.transform = `translateX(-50%) translate3d(0, ${shift}px, 0)`;
-          } else {
-            el.style.transform = `translate3d(0, ${shift}px, 0)`;
-          }
+<script is:inline>
+  (function () {
+    function bindAtmosphere() {
+      var root = document.querySelector('[data-atmosphere]');
+      if (!root || root.dataset.bound === '1') return;
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      root.dataset.bound = '1';
+      var layers = root.querySelectorAll('[data-depth]');
+      var ticking = false;
+      var onScroll = function () {
+        if (ticking) return;
+        ticking = true;
+        requestAnimationFrame(function () {
+          var y = window.scrollY || 0;
+          layers.forEach(function (el) {
+            var depth = Number(el.getAttribute('data-depth') || 0.1);
+            var shift = y * depth;
+            if (el.classList.contains('art-mid')) {
+              el.style.transform = 'translateX(-50%) translate3d(0,' + shift + 'px,0)';
+            } else {
+              el.style.transform = 'translate3d(0,' + shift + 'px,0)';
+            }
+          });
+          ticking = false;
         });
-        ticking = false;
-      });
-    };
-    onScroll();
-    window.addEventListener('scroll', onScroll, { passive: true });
-  }
+      };
+      onScroll();
+      window.addEventListener('scroll', onScroll, { passive: true });
+    }
+    bindAtmosphere();
+    document.addEventListener('astro:page-load', function () {
+      var root = document.querySelector('[data-atmosphere]');
+      if (root) root.dataset.bound = '';
+      bindAtmosphere();
+    });
+  })();
 </script>

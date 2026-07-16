@@ -11,45 +11,104 @@ import { path } from '../../lib/paths';
       <span>本机笔记</span>
     </div>
   </div>
-  <article class="article-wrap">
-    <div class="article-card" data-local-note data-notes-path={path('/notes')}>
+  <article class="article-wrap" data-animate="fade-up">
+    <div class="article-card" id="local-note" data-notes-path={path('/notes')}>
       <p class="loading">加载中…</p>
     </div>
   </article>
 </BaseLayout>
 
-<script>
-  import { readUserNotes } from '../../lib/auth.ts';
-  import { marked } from 'marked';
+<script is:inline>
+  (function () {
+    var LS_KEY = 'personal-site-user-notes-v1';
+    var DB_NAME = 'personal-site-notes-db';
+    var STORE = 'notes';
 
-  const root = document.querySelector<HTMLElement>('[data-local-note]');
-  const notesPath = root?.dataset.notesPath || '/notes';
-  const params = new URLSearchParams(location.search);
-  const slug = params.get('slug') || '';
-  const note = readUserNotes().find((n) => n.slug === slug);
+    function openDb() {
+      return new Promise(function (resolve, reject) {
+        if (!window.indexedDB) return reject(new Error('no idb'));
+        var req = indexedDB.open(DB_NAME, 1);
+        req.onupgradeneeded = function () {
+          var db = req.result;
+          if (!db.objectStoreNames.contains(STORE)) db.createObjectStore(STORE, { keyPath: 'slug' });
+        };
+        req.onsuccess = function () {
+          resolve(req.result);
+        };
+        req.onerror = function () {
+          reject(req.error);
+        };
+      });
+    }
 
-  if (!root) {
-    // no-op
-  } else if (!note) {
-    root.innerHTML = `<p>未找到本机笔记。请先在后台保存，或返回<a href="${notesPath}">笔记列表</a>。</p>`;
-  } else {
-    document.title = `${note.title} · 赵海蓺`;
-    const html = marked.parse(note.body, { async: false }) as string;
-    root.innerHTML = `
-      <div class="cat">${note.categoryLabel}</div>
-      <h1 class="serif">${escapeHtml(note.title)}</h1>
-      <div class="meta">
-        <span>${note.publishedAt}</span>
-        <span>约 ${note.readingMinutes} 分钟</span>
-        <span>状态：${note.status === 'growing' ? '生长中' : '已发布'} · 本机</span>
-      </div>
-      <div class="prose">${html}</div>
-    `;
-  }
+    async function findNote(slug) {
+      try {
+        var db = await openDb();
+        var note = await new Promise(function (resolve, reject) {
+          var tx = db.transaction(STORE, 'readonly');
+          var req = tx.objectStore(STORE).get(slug);
+          req.onsuccess = function () {
+            resolve(req.result || null);
+          };
+          req.onerror = function () {
+            reject(req.error);
+          };
+        });
+        if (note) return note;
+      } catch (e) {}
+      try {
+        var list = JSON.parse(localStorage.getItem(LS_KEY) || '[]');
+        for (var i = 0; i < list.length; i++) if (list[i].slug === slug) return list[i];
+      } catch (e2) {}
+      return null;
+    }
 
-  function escapeHtml(s: string) {
-    return s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c] as string);
-  }
+    function escapeHtml(s) {
+      return String(s).replace(/[&<>"']/g, function (c) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+      });
+    }
+
+    async function boot() {
+      var root = document.getElementById('local-note');
+      if (!root) return;
+      var notesPath = root.getAttribute('data-notes-path') || '/notes';
+      var slug = new URLSearchParams(location.search).get('slug') || '';
+      var note = await findNote(slug);
+      if (!note) {
+        root.innerHTML =
+          '<p>未找到本机笔记。请先在后台保存，或返回<a href="' + notesPath + '">笔记列表</a>。</p>';
+        return;
+      }
+      document.title = note.title + ' · 赵海蓺';
+      // lightweight markdown: escape + line breaks + code fences
+      var body = escapeHtml(note.body || '')
+        .replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>')
+        .replace(/^### (.*)$/gm, '<h3>$1</h3>')
+        .replace(/^## (.*)$/gm, '<h2>$1</h2>')
+        .replace(/^# (.*)$/gm, '<h2>$1</h2>')
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\n\n/g, '</p><p>')
+        .replace(/\n/g, '<br/>');
+      root.innerHTML =
+        '<div class="cat">' +
+        escapeHtml(note.categoryLabel || '随笔') +
+        '</div><h1 class="serif">' +
+        escapeHtml(note.title) +
+        '</h1><div class="meta"><span>' +
+        escapeHtml(note.publishedAt || '') +
+        '</span><span>约 ' +
+        (note.readingMinutes || 1) +
+        ' 分钟</span><span>本机 · ' +
+        (note.status === 'growing' ? '生长中' : '已发布') +
+        '</span></div><div class="prose"><p>' +
+        body +
+        '</p></div>';
+    }
+
+    boot();
+    document.addEventListener('astro:page-load', boot);
+  })();
 </script>
 
 <style>
@@ -100,10 +159,5 @@ import { path } from '../../lib/paths';
     margin-bottom: 28px;
     padding-bottom: 20px;
     border-bottom: 1px solid var(--line);
-  }
-  @media (max-width: 640px) {
-    .article-card {
-      padding: 24px 18px 28px;
-    }
   }
 </style>
