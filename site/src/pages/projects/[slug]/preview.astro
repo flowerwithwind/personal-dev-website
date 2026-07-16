@@ -126,8 +126,11 @@ const tone =
     function isHttpUrl(url) {
       return /^http:\/\//i.test(url || '');
     }
-    function isMixedContentBlocked(url) {
-      return location.protocol === 'https:' && isHttpUrl(url);
+    /** HTTPS 页无法内嵌 HTTP 演示；HTTP 页可以 */
+    function canEmbed(url) {
+      if (!url) return false;
+      if (location.protocol === 'https:' && isHttpUrl(url)) return false;
+      return true;
     }
 
     function boot() {
@@ -139,11 +142,12 @@ const tone =
       var loading = document.getElementById('frame-loading');
       var state = document.getElementById('preview-state');
       var stateNew = document.getElementById('state-new-tab');
+      var stateTitle = document.getElementById('state-title');
+      var stateDesc = document.getElementById('state-desc');
       var badge = document.getElementById('preview-badge');
+      var note = document.getElementById('preview-note');
       if (!select || !frame || select.dataset.bound === '1') return;
       select.dataset.bound = '1';
-
-      var embedDefault = frame.getAttribute('data-embed-default') === '1';
 
       function setUrl(url) {
         if (!url) return;
@@ -151,17 +155,26 @@ const tone =
         if (openExt) openExt.setAttribute('href', url);
         if (stateNew) stateNew.setAttribute('href', url);
 
-        if (isMixedContentBlocked(url) || !embedDefault) {
-          if (!embedDefault || isMixedContentBlocked(url)) {
-            frame.src = 'about:blank';
-            if (loading) loading.hidden = true;
-            if (state) state.hidden = false;
-            if (badge) {
-              badge.textContent = '外链';
-              badge.classList.add('warn');
-            }
-            return;
+        // 以当前页协议为准：HTTP 个人站始终尝试 iframe
+        if (!canEmbed(url)) {
+          frame.removeAttribute('src');
+          frame.src = 'about:blank';
+          if (loading) loading.hidden = true;
+          if (state) state.hidden = false;
+          if (badge) {
+            badge.textContent = '外链';
+            badge.classList.add('warn');
           }
+          if (stateTitle) stateTitle.textContent = '在此环境请用新标签预览';
+          if (stateDesc) {
+            stateDesc.textContent =
+              '当前页是 HTTPS，演示站是 HTTP 时浏览器会拦截 iframe（Mixed Content）。请新标签打开，或使用 HTTP 服务器版个人站。';
+          }
+          if (note) {
+            note.textContent =
+              'Mixed Content：HTTPS 页面不能内嵌 HTTP 地址。GitHub Pages 会触发此限制；http://IP:18083 不会。';
+          }
+          return;
         }
 
         if (state) state.hidden = true;
@@ -171,6 +184,10 @@ const tone =
         }
         if (loading) loading.hidden = false;
         frame.src = url;
+        if (note) {
+          note.textContent =
+            '若预览区空白，可能是目标站禁止被嵌入（X-Frame-Options / CSP）。可点「新标签打开」或切换上方服务。';
+        }
       }
 
       select.addEventListener('change', function () {
@@ -190,9 +207,7 @@ const tone =
         if (loading) loading.hidden = true;
       }, 2800);
 
-      if (embedDefault) {
-        setUrl(select.value || select.getAttribute('data-default-url') || '');
-      }
+      setUrl(select.value || select.getAttribute('data-default-url') || '');
     }
     boot();
     document.addEventListener('astro:page-load', function () {
@@ -351,6 +366,11 @@ const tone =
     background: rgba(247, 245, 239, 0.72);
     pointer-events: none;
     z-index: 1;
+  }
+  /* author display 会盖掉 UA 的 [hidden]{display:none}，必须显式写 */
+  .loading[hidden],
+  .state[hidden] {
+    display: none !important;
   }
   .state {
     position: absolute;
