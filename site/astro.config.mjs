@@ -1,9 +1,17 @@
 import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
-import { getAstroSite, getAstroBase, customDomain } from './domain.config.mjs';
+import {
+  getAstroSite,
+  getAstroBase,
+  getSiteUrl,
+  customDomain,
+  getDeployTarget,
+} from './domain.config.mjs';
 
 const site = getAstroSite();
 const base = getAstroBase();
+
+console.log(`[astro] deployTarget=${getDeployTarget()} site=${site} base=${base}`);
 
 export default defineConfig({
   site,
@@ -16,11 +24,7 @@ export default defineConfig({
   vite: {
     define: {
       __CUSTOM_DOMAIN__: JSON.stringify(customDomain || ''),
-      __PUBLIC_SITE_URL__: JSON.stringify(
-        customDomain
-          ? `https://${String(customDomain).replace(/^https?:\/\//, '').replace(/\/$/, '')}`
-          : `${site}${base === '/' ? '' : base}`,
-      ),
+      __PUBLIC_SITE_URL__: JSON.stringify(getSiteUrl()),
     },
   },
 });

@@ -23,6 +23,9 @@ export type ProjectDeploy = {
   services: DeployService[];
 };
 
+/** 个人站服务器端口（与 deploy/docker-compose.prod.yml 一致） */
+export const PERSONAL_SITE_PORT = 18083;
+
 export const PROJECT_DEPLOYS: ProjectDeploy[] = [
   {
     projectKey: 'smartqa',

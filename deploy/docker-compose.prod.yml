@@ -1,0 +1,24 @@
+# 个人站生产编排
+# 部署目录: /opt/personal-dev-website
+# 对外端口默认 18083（不常用；与 18080/18082/18000/18001/18002 错开）
+
+services:
+  personal-site:
+    image: ${DOCKER_USERNAME}/personal-dev-website:${IMAGE_TAG:-latest}
+    container_name: personal-dev-website
+    restart: unless-stopped
+    ports:
+      - "${HTTP_PORT:-18083}:80"
+    environment:
+      - TZ=Asia/Shanghai
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1/healthz"]
+      interval: 30s
+      timeout: 8s
+      retries: 5
+      start_period: 15s
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
