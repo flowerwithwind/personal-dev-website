@@ -2,7 +2,7 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { getAllNotes, getNoteFilterChips } from '../../data/notes';
 import { formatDate } from '../../lib/format';
-import { path } from '../../lib/paths';
+import { path, noteDetailPath } from '../../lib/paths';
 
 const notes = getAllNotes();
 const chips = getNoteFilterChips();
@@ -36,15 +36,17 @@ const chips = getNoteFilterChips();
       class="list"
       id="note-list"
       data-animate-stagger
-      data-local-base={path('/notes/local/')}
+      data-local-base={path('/notes/local')}
       data-admin-path={path('/admin')}
       data-login-path={path('/login')}
     >
       {
         notes.map((note) => (
           <a
-            class="item"
-            href={path(`/notes/${note.slug}`)}
+            class="item card-float"
+            href={noteDetailPath(note.slug)}
+            data-card="note-list"
+            data-detail-href={noteDetailPath(note.slug)}
             data-tags={[...note.filters, ...note.tags, note.categoryLabel].join('|')}
           >
             <div>
@@ -106,11 +108,14 @@ const chips = getNoteFilterChips();
     border: 1px solid rgba(255, 255, 255, 0.75);
     border-radius: var(--radius);
     box-shadow: var(--shadow-sm);
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    transition:
+      transform 0.2s ease,
+      box-shadow 0.2s ease;
   }
-  .item:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow);
+  .item:hover,
+  .item:focus-visible {
+    transform: translateY(-6px);
+    box-shadow: 0 22px 48px rgba(15, 15, 20, 0.12);
   }
   .cat {
     font-size: 12px;

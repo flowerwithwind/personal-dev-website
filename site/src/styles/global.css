@@ -155,6 +155,20 @@ input {
   text-decoration: underline;
 }
 
+/* Shared card float (lift + stronger shadow); components may refine */
+.card-float {
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+@media (prefers-reduced-motion: reduce) {
+  .card-float:hover,
+  .card-float:focus-visible,
+  .card-float:focus-within {
+    transform: none;
+  }
+}
+
 /* Buttons */
 .btn {
   display: inline-flex;

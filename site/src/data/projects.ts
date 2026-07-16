@@ -4,7 +4,7 @@ import {
   buildDeployUrl,
   useInSitePreview,
 } from './deploy';
-import { path } from '../lib/paths';
+import { projectDetailPath, projectPreviewPath } from '../lib/paths';
 
 export type Project = {
   slug: string;
@@ -151,9 +151,14 @@ export function getProjectPreviewUrl(project: Project): string {
   );
 }
 
+/** 项目详情页路径 */
+export function getProjectDetailPath(project: Project): string {
+  return projectDetailPath(project.slug);
+}
+
 /** 站内 iframe 预览页路径 */
 export function getInSitePreviewPath(project: Project): string {
-  return path(`/projects/${project.slug}/preview`);
+  return projectPreviewPath(project.slug);
 }
 
 /**

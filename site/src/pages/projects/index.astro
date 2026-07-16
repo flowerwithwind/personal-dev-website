@@ -5,6 +5,7 @@ import {
   getFeaturedProject,
   getAllProjects,
   getPreviewHref,
+  getProjectDetailPath,
   isPreviewExternal,
   getProjectServices,
 } from '../../data/projects';
@@ -14,6 +15,7 @@ import { path } from '../../lib/paths';
 const featured = getFeaturedProject()!;
 const others = getAllProjects().filter((p) => p.slug !== featured.slug);
 const featuredPreview = getPreviewHref(featured);
+const featuredDetail = getProjectDetailPath(featured);
 const external = isPreviewExternal();
 const featuredServices = getProjectServices(featured);
 const featuredPrimary =
@@ -50,7 +52,14 @@ const rows = getAllDeployRows();
       <button type="button" class="chip" data-filter="live">已上线</button>
     </div>
 
-    <article class="featured" data-project-card data-filters={featured.filters.join(' ')}>
+    <article
+      class="featured card-float"
+      data-project-card
+      data-card="featured-project"
+      data-detail-href={featuredDetail}
+      data-filters={featured.filters.join(' ')}
+    >
+      <a class="card-hit" href={featuredDetail} aria-label={`查看项目详情：${featured.title}`} data-card-primary></a>
       <div class:list={['featured-visual', featured.coverTone]}>
         <div>
           <div class="label">FEATURED · AI AGENT</div>
@@ -83,13 +92,14 @@ const rows = getAllDeployRows();
             href={featuredPreview}
             target={external ? '_blank' : undefined}
             rel={external ? 'noopener noreferrer' : undefined}
+            data-card-action="preview"
           >
             预览项目
           </a>
-          <a class="btn btn-light" href={path(`/projects/${featured.slug}`)}>查看详情</a>
+          <a class="btn btn-light" href={featuredDetail} data-card-action="detail">查看详情</a>
           {
             featured.github && (
-              <a class="btn btn-soft" href={featured.github} target="_blank" rel="noopener noreferrer">
+              <a class="btn btn-soft" href={featured.github} target="_blank" rel="noopener noreferrer" data-card-action="github">
                 GitHub
               </a>
             )
@@ -208,6 +218,7 @@ const rows = getAllDeployRows();
     margin-bottom: 20px;
   }
   .featured {
+    position: relative;
     display: grid;
     grid-template-columns: 1.05fr 1.2fr;
     gap: 0;
@@ -217,6 +228,24 @@ const rows = getAllDeployRows();
     background: rgba(255, 255, 255, 0.92);
     border: 1px solid rgba(255, 255, 255, 0.8);
     box-shadow: var(--shadow);
+    transition:
+      transform 0.2s ease,
+      box-shadow 0.2s ease;
+  }
+  .featured:hover,
+  .featured:focus-within {
+    transform: translateY(-6px);
+    box-shadow: 0 24px 52px rgba(15, 15, 20, 0.14);
+  }
+  .featured .card-hit {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    border-radius: inherit;
+  }
+  .featured .card-hit:focus-visible {
+    outline: none;
+    box-shadow: inset 0 0 0 3px rgba(91, 77, 255, 0.35);
   }
   .featured-visual {
     min-height: 280px;
@@ -225,6 +254,7 @@ const rows = getAllDeployRows();
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    pointer-events: none;
   }
   .featured-visual.violet {
     background:
@@ -253,9 +283,19 @@ const rows = getAllDeployRows();
     line-height: 1.7;
   }
   .featured-body {
+    position: relative;
+    z-index: 1;
     padding: 28px 28px 24px;
     display: flex;
     flex-direction: column;
+    pointer-events: none;
+  }
+  .featured-body .actions {
+    pointer-events: auto;
+  }
+  .featured-body .actions a {
+    position: relative;
+    z-index: 2;
   }
   .cat {
     display: flex;

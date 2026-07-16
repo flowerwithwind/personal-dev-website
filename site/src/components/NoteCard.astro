@@ -1,16 +1,22 @@
 ---
 import type { Note } from '../data/notes';
 import { formatDate } from '../lib/format';
-import { path } from '../lib/paths';
+import { noteDetailPath } from '../lib/paths';
 
 interface Props {
   note: Note;
   large?: boolean;
 }
 const { note, large = false } = Astro.props;
+const detailHref = noteDetailPath(note.slug);
 ---
 
-<a class:list={['note-card', { large }]} href={path(`/notes/${note.slug}`)}>
+<a
+  class:list={['note-card', 'card-float', { large }]}
+  href={detailHref}
+  data-card="note"
+  data-detail-href={detailHref}
+>
   <div class="cat">{note.categoryLabel}</div>
   <h3>{note.title}</h3>
   <p>{note.summary}</p>
@@ -32,11 +38,14 @@ const { note, large = false } = Astro.props;
     border: 1px solid rgba(255, 255, 255, 0.75);
     border-radius: var(--radius);
     box-shadow: var(--shadow-sm);
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    transition:
+      transform 0.2s ease,
+      box-shadow 0.2s ease;
   }
-  .note-card:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow);
+  .note-card:hover,
+  .note-card:focus-visible {
+    transform: translateY(-6px);
+    box-shadow: 0 22px 48px rgba(15, 15, 20, 0.12);
   }
   .note-card.large {
     grid-row: span 2;

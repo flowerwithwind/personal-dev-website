@@ -6,6 +6,7 @@ import { getFeaturedNotes } from '../data/notes';
 import {
   getAllProjects,
   getPreviewHref,
+  getProjectDetailPath,
   isPreviewExternal,
 } from '../data/projects';
 import { path } from '../lib/paths';
@@ -79,26 +80,34 @@ const externalPreview = isPreviewExternal();
       </div>
       <div class="projects-grid" data-animate-stagger>
         {
-          projectCards.map((p) => (
-            <a class:list={['mini-project', p.coverTone]} href={path(`/projects/${p.slug}`)}>
-              <div class="thumb">{p.shortTitle}</div>
-              <div class="body">
-                <h3>{p.title}</h3>
-                <p>{p.summary}</p>
-                <div class="tags">
-                  {p.tags.slice(0, 3).map((t) => (
-                    <span class="tag">{t}</span>
-                  ))}
+          projectCards.map((p) => {
+            const detailHref = getProjectDetailPath(p);
+            return (
+              <a
+                class:list={['mini-project', 'card-float', p.coverTone]}
+                href={detailHref}
+                data-card="mini-project"
+                data-detail-href={detailHref}
+              >
+                <div class="thumb">{p.shortTitle}</div>
+                <div class="body">
+                  <h3>{p.title}</h3>
+                  <p>{p.summary}</p>
+                  <div class="tags">
+                    {p.tags.slice(0, 3).map((t) => (
+                      <span class="tag">{t}</span>
+                    ))}
+                  </div>
+                  <div class="mini-actions">
+                    <span class="preview-hint">
+                      {externalPreview ? '可预览 · 新标签打开' : '可预览 · 站内内嵌'}
+                    </span>
+                    <span class="go">查看 →</span>
+                  </div>
                 </div>
-                <div class="mini-actions">
-                  <span class="preview-hint">
-                    {externalPreview ? '可预览 · 新标签打开' : '可预览 · 站内内嵌'}
-                  </span>
-                  <span class="go">查看 →</span>
-                </div>
-              </div>
-            </a>
-          ))
+              </a>
+            );
+          })
         }
       </div>
       <!-- progressive: also expose preview links for crawlers / no-JS users via list page -->
@@ -250,16 +259,20 @@ const externalPreview = isPreviewExternal();
     gap: 14px;
   }
   .mini-project {
+    display: block;
     overflow: hidden;
     background: rgba(255, 255, 255, 0.9);
     border: 1px solid rgba(255, 255, 255, 0.75);
     border-radius: var(--radius);
     box-shadow: var(--shadow-sm);
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    transition:
+      transform 0.2s ease,
+      box-shadow 0.2s ease;
   }
-  .mini-project:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow);
+  .mini-project:hover,
+  .mini-project:focus-visible {
+    transform: translateY(-6px);
+    box-shadow: 0 22px 48px rgba(15, 15, 20, 0.12);
   }
   .mini-project .thumb {
     height: 112px;
