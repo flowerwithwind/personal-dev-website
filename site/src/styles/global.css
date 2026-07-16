@@ -51,16 +51,27 @@ body {
   color: var(--ink);
   line-height: 1.7;
   -webkit-font-smoothing: antialiased;
+  position: relative;
+  isolation: isolate;
   background-color: var(--bg-base);
   background-image:
-    radial-gradient(rgba(12, 11, 16, 0.04) 1px, transparent 1px),
-    radial-gradient(980px 560px at 10% -12%, rgba(124, 108, 255, 0.26), transparent 58%),
-    radial-gradient(860px 500px at 98% 4%, rgba(20, 184, 166, 0.16), transparent 54%),
-    radial-gradient(720px 440px at 48% 108%, rgba(244, 114, 182, 0.11), transparent 56%),
-    radial-gradient(600px 320px at 70% 40%, rgba(251, 191, 36, 0.06), transparent 50%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.4) 0%, transparent 26%, transparent 70%, rgba(228, 223, 210, 0.55) 100%);
-  background-size: 22px 22px, auto, auto, auto, auto, auto;
+    /* soft paper grain */
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E"),
+    radial-gradient(rgba(12, 11, 16, 0.035) 1px, transparent 1px),
+    radial-gradient(1000px 580px at 8% -14%, rgba(167, 139, 250, 0.28), transparent 58%),
+    radial-gradient(900px 520px at 100% 0%, rgba(45, 212, 191, 0.18), transparent 54%),
+    radial-gradient(760px 460px at 50% 110%, rgba(251, 191, 36, 0.12), transparent 56%),
+    radial-gradient(640px 360px at 70% 45%, rgba(244, 114, 182, 0.08), transparent 50%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.45) 0%, transparent 24%, transparent 68%, rgba(230, 224, 210, 0.6) 100%);
+  background-size: 180px 180px, 22px 22px, auto, auto, auto, auto, auto;
   background-attachment: fixed;
+}
+
+body > main,
+body > header,
+body > footer {
+  position: relative;
+  z-index: 1;
 }
 
 @media (max-width: 860px) {

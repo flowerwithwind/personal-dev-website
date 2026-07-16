@@ -1,3 +1,5 @@
+import { DEFAULT_ADMIN_PASSWORD_SHA256 } from '../lib/auth';
+
 export const siteConfig = {
   name: '赵海蓺',
   nameEn: 'Zhao Haiyi',
@@ -8,6 +10,14 @@ export const siteConfig = {
   github: 'https://github.com',
   tagline: '写一点笔记，做一些能跑起来的东西',
   locale: 'zh-CN',
+  /** Resume file under public/ */
+  resumePath: '/resume.pdf',
+  /**
+   * SHA-256 hex of admin password.
+   * Default password: `haiyi2026` — change hash after you set a new password.
+   * Generate: `python -c "import hashlib;print(hashlib.sha256(b'YOUR_PASS').hexdigest())"`
+   */
+  adminPasswordSha256: DEFAULT_ADMIN_PASSWORD_SHA256,
 };
 
 export type NowItem = {

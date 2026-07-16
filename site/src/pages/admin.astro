@@ -1,0 +1,309 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { path } from '../lib/paths';
+---
+
+<BaseLayout current="admin" title="写笔记" description="作者笔记编辑台">
+  <div class="container wrap" data-admin-root data-login-path={path('/login')} data-notes-path={path('/notes')}>
+    <div class="gate card" data-gate>
+      <p>正在校验登录状态…</p>
+    </div>
+
+    <div class="panel" data-panel hidden>
+      <header class="head">
+        <div>
+          <p class="eyebrow">Admin · 已登录</p>
+          <h1 class="serif">写一篇笔记</h1>
+          <p class="sub">笔记先保存在本浏览器；可导出 Markdown 后提交到仓库做永久发布。</p>
+        </div>
+        <div class="head-actions">
+          <a class="btn btn-light btn-sm" href={path('/notes')}>查看笔记列表</a>
+          <button type="button" class="btn btn-soft btn-sm" data-logout>退出登录</button>
+        </div>
+      </header>
+
+      <form class="editor card" data-note-form>
+        <label>
+          <span>标题</span>
+          <input name="title" required maxlength="120" placeholder="例如：本周关于 RAG 的三处思考" />
+        </label>
+        <label>
+          <span>摘要</span>
+          <input name="summary" required maxlength="200" placeholder="一句话说明这篇笔记在讲什么" />
+        </label>
+        <div class="row">
+          <label>
+            <span>分类标签</span>
+            <select name="categoryLabel">
+              <option>Essay · Agent</option>
+              <option>Note · RAG</option>
+              <option>Journal</option>
+              <option>Reading</option>
+              <option>Garden · Seed</option>
+              <option selected>随笔</option>
+            </select>
+          </label>
+          <label>
+            <span>状态</span>
+            <select name="status">
+              <option value="published">已发布</option>
+              <option value="growing">生长中</option>
+            </select>
+          </label>
+        </div>
+        <label>
+          <span>标签（逗号分隔）</span>
+          <input name="tags" placeholder="Agent, 工程, 随笔" />
+        </label>
+        <label>
+          <span>正文（支持 Markdown）</span>
+          <textarea name="body" required rows="14" placeholder="写点什么…"></textarea>
+        </label>
+        <div class="actions">
+          <button class="btn btn-dark" type="submit">保存到本站（本机）</button>
+          <button class="btn btn-light" type="button" data-export>导出 Markdown 文件</button>
+        </div>
+        <p class="ok" data-ok hidden>已保存。可在「笔记」列表中看到（仅此浏览器）。</p>
+      </form>
+
+      <section class="list card">
+        <h2 class="serif">本机已存笔记</h2>
+        <ul data-user-note-list></ul>
+      </section>
+    </div>
+  </div>
+</BaseLayout>
+
+<script>
+  import {
+    readSession,
+    clearSession,
+    readUserNotes,
+    upsertUserNote,
+    slugifyTitle,
+    type UserNote,
+  } from '../lib/auth.ts';
+
+  const root = document.querySelector<HTMLElement>('[data-admin-root]');
+  const gate = document.querySelector('[data-gate]');
+  const panel = document.querySelector<HTMLElement>('[data-panel]');
+  const form = document.querySelector<HTMLFormElement>('[data-note-form]');
+  const listEl = document.querySelector('[data-user-note-list]');
+  const ok = document.querySelector('[data-ok]');
+  const loginPath = root?.dataset.loginPath || '/login';
+  const notesPath = root?.dataset.notesPath || '/notes';
+
+  if (!readSession()) {
+    location.replace(loginPath);
+  } else {
+    gate?.setAttribute('hidden', '');
+    panel?.removeAttribute('hidden');
+  }
+
+  function renderList() {
+    if (!listEl) return;
+    const notes = readUserNotes();
+    if (!notes.length) {
+      listEl.innerHTML = '<li class="empty">还没有本机笔记。</li>';
+      return;
+    }
+    listEl.innerHTML = notes
+      .map(
+        (n) =>
+          `<li><a href="${notesPath}/local/?slug=${encodeURIComponent(n.slug)}"><strong>${escapeHtml(n.title)}</strong><span>${n.publishedAt}</span></a></li>`,
+      )
+      .join('');
+  }
+
+  function escapeHtml(s: string) {
+    return s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c] as string);
+  }
+
+  function formToNote(fd: FormData): UserNote {
+    const title = String(fd.get('title') || '').trim();
+    const tags = String(fd.get('tags') || '')
+      .split(/[,，]/)
+      .map((t) => t.trim())
+      .filter(Boolean);
+    const body = String(fd.get('body') || '');
+    const words = body.replace(/\s+/g, '').length;
+    return {
+      slug: slugifyTitle(title),
+      title,
+      summary: String(fd.get('summary') || '').trim(),
+      categoryLabel: String(fd.get('categoryLabel') || '随笔'),
+      tags,
+      filters: tags.length ? tags : ['随笔'],
+      publishedAt: new Date().toISOString().slice(0, 10),
+      readingMinutes: Math.max(1, Math.round(words / 400)),
+      status: (String(fd.get('status') || 'published') as 'published' | 'growing'),
+      body,
+      source: 'user',
+    };
+  }
+
+  form?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const note = formToNote(new FormData(form));
+    upsertUserNote(note);
+    ok?.removeAttribute('hidden');
+    form.reset();
+    renderList();
+  });
+
+  document.querySelector('[data-export]')?.addEventListener('click', () => {
+    if (!form) return;
+    const note = formToNote(new FormData(form));
+    const md = `---\ntitle: ${note.title}\nslug: ${note.slug}\ndate: ${note.publishedAt}\ntags: [${note.tags.join(', ')}]\n---\n\n${note.body}\n`;
+    const blob = new Blob([md], { type: 'text/markdown;charset=utf-8' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `${note.slug}.md`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  });
+
+  document.querySelector('[data-logout]')?.addEventListener('click', () => {
+    clearSession();
+    location.href = loginPath;
+  });
+
+  renderList();
+</script>
+
+<style>
+  .wrap {
+    padding: 40px 0 64px;
+  }
+  .gate,
+  .card {
+    background: rgba(255, 255, 255, 0.92);
+    border: 1px solid rgba(255, 255, 255, 0.85);
+    border-radius: 22px;
+    box-shadow: var(--shadow-sm);
+    backdrop-filter: blur(10px);
+  }
+  .gate {
+    padding: 28px;
+    text-align: center;
+    color: var(--muted);
+  }
+  .head {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    align-items: start;
+    margin-bottom: 18px;
+  }
+  .eyebrow {
+    margin: 0 0 6px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--accent-2);
+    letter-spacing: 0.04em;
+  }
+  h1 {
+    margin: 0 0 8px;
+    font-size: 32px;
+    font-weight: 600;
+  }
+  .sub {
+    margin: 0;
+    color: var(--muted);
+    font-size: 14px;
+    font-weight: 500;
+    max-width: 520px;
+  }
+  .head-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .editor {
+    padding: 22px;
+    display: grid;
+    gap: 14px;
+    margin-bottom: 16px;
+  }
+  label {
+    display: grid;
+    gap: 7px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink-soft);
+  }
+  input,
+  select,
+  textarea {
+    border-radius: 12px;
+    border: 1px solid var(--line-strong);
+    background: #fff;
+    padding: 11px 12px;
+    font: inherit;
+  }
+  textarea {
+    resize: vertical;
+    min-height: 220px;
+    line-height: 1.65;
+  }
+  .row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .ok {
+    margin: 0;
+    color: #0f766e;
+    font-size: 13.5px;
+    font-weight: 600;
+  }
+  .list {
+    padding: 20px 22px;
+  }
+  .list h2 {
+    margin: 0 0 12px;
+    font-size: 20px;
+    font-weight: 600;
+  }
+  .list ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 8px;
+  }
+  .list li a {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 14px;
+    border-radius: 12px;
+    border: 1px solid var(--line);
+    background: rgba(243, 241, 234, 0.5);
+    font-size: 14px;
+  }
+  .list li a:hover {
+    border-color: rgba(91, 77, 255, 0.25);
+  }
+  .list span {
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .empty {
+    color: var(--muted);
+    font-size: 14px;
+  }
+  @media (max-width: 640px) {
+    .row {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

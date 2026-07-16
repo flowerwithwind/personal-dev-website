@@ -1,0 +1,109 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { path } from '../../lib/paths';
+---
+
+<BaseLayout current="notes" title="笔记" description="本机笔记详情">
+  <div class="container">
+    <div class="crumb">
+      <a href={path('/notes')}>笔记</a>
+      <span>/</span>
+      <span>本机笔记</span>
+    </div>
+  </div>
+  <article class="article-wrap">
+    <div class="article-card" data-local-note data-notes-path={path('/notes')}>
+      <p class="loading">加载中…</p>
+    </div>
+  </article>
+</BaseLayout>
+
+<script>
+  import { readUserNotes } from '../../lib/auth.ts';
+  import { marked } from 'marked';
+
+  const root = document.querySelector<HTMLElement>('[data-local-note]');
+  const notesPath = root?.dataset.notesPath || '/notes';
+  const params = new URLSearchParams(location.search);
+  const slug = params.get('slug') || '';
+  const note = readUserNotes().find((n) => n.slug === slug);
+
+  if (!root) {
+    // no-op
+  } else if (!note) {
+    root.innerHTML = `<p>未找到本机笔记。请先在后台保存，或返回<a href="${notesPath}">笔记列表</a>。</p>`;
+  } else {
+    document.title = `${note.title} · 赵海蓺`;
+    const html = marked.parse(note.body, { async: false }) as string;
+    root.innerHTML = `
+      <div class="cat">${note.categoryLabel}</div>
+      <h1 class="serif">${escapeHtml(note.title)}</h1>
+      <div class="meta">
+        <span>${note.publishedAt}</span>
+        <span>约 ${note.readingMinutes} 分钟</span>
+        <span>状态：${note.status === 'growing' ? '生长中' : '已发布'} · 本机</span>
+      </div>
+      <div class="prose">${html}</div>
+    `;
+  }
+
+  function escapeHtml(s: string) {
+    return s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c] as string);
+  }
+</script>
+
+<style>
+  .crumb {
+    padding: 28px 0 8px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--muted);
+    display: flex;
+    gap: 8px;
+  }
+  .crumb a {
+    color: var(--accent);
+  }
+  .article-wrap {
+    max-width: 740px;
+    margin: 0 auto;
+    padding: 12px 24px 48px;
+  }
+  .article-card {
+    background: rgba(255, 255, 255, 0.92);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    border-radius: 24px;
+    box-shadow: var(--shadow);
+    padding: 36px 40px 40px;
+  }
+  .loading {
+    color: var(--muted);
+  }
+  :global(.cat) {
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 12px;
+  }
+  :global(h1.serif) {
+    font-size: clamp(28px, 4vw, 34px);
+    font-weight: 600;
+    margin: 0 0 14px;
+  }
+  :global(.meta) {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 18px;
+    color: rgba(12, 11, 16, 0.42);
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 28px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--line);
+  }
+  @media (max-width: 640px) {
+    .article-card {
+      padding: 24px 18px 28px;
+    }
+  }
+</style>

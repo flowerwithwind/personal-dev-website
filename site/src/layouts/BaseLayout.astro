@@ -1,6 +1,7 @@
 ---
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+import Atmosphere from '../components/Atmosphere.astro';
 import { siteConfig } from '../data/site';
 import { path } from '../lib/paths';
 import '../styles/global.css';
@@ -8,12 +9,14 @@ import '../styles/global.css';
 interface Props {
   title?: string;
   description?: string;
-  current?: 'home' | 'notes' | 'projects' | 'about';
+  current?: 'home' | 'notes' | 'projects' | 'about' | 'admin' | 'login';
+  hideChrome?: boolean;
 }
 const {
   title = siteConfig.title,
   description = siteConfig.description,
   current = 'home',
+  hideChrome = false,
 } = Astro.props;
 const fullTitle = title === siteConfig.title ? title : `${title} · ${siteConfig.name}`;
 ---
@@ -35,10 +38,11 @@ const fullTitle = title === siteConfig.title ? title : `${title} · ${siteConfig
     <title>{fullTitle}</title>
   </head>
   <body>
-    <Header current={current} />
+    <Atmosphere />
+    {!hideChrome && <Header current={current} />}
     <main>
       <slot />
     </main>
-    <Footer />
+    {!hideChrome && <Footer />}
   </body>
 </html>

@@ -12,6 +12,10 @@ if (-not (Test-Path $dist)) {
 if (Test-Path $tmp) { Remove-Item -Recurse -Force $tmp }
 New-Item -ItemType Directory -Path $tmp | Out-Null
 Copy-Item -Recurse -Force (Join-Path $dist '*') $tmp
+# Ensure GitHub Pages serves underscore assets
+if (-not (Test-Path (Join-Path $tmp '.nojekyll'))) {
+  New-Item -ItemType File -Path (Join-Path $tmp '.nojekyll') | Out-Null
+}
 
 Push-Location $tmp
 try {

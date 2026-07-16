@@ -1,7 +1,8 @@
 ---
 import { path } from '../lib/paths';
+import { siteConfig } from '../data/site';
 interface Props {
-  current?: 'home' | 'notes' | 'projects' | 'about';
+  current?: 'home' | 'notes' | 'projects' | 'about' | 'admin' | 'login';
 }
 const { current = 'home' } = Astro.props;
 const items = [
@@ -10,13 +11,27 @@ const items = [
   { id: 'projects', href: path('/projects'), label: '项目' },
   { id: 'about', href: path('/about'), label: '关于' },
 ] as const;
+const resumeHref = path(siteConfig.resumePath);
 ---
 
 <header class="site-header" data-header>
   <div class="header-inner container">
     <a class="logo" href={path('/')}>
-      <span class="logo-mark" aria-hidden="true"></span>
-      <span>赵海蓺</span>
+      <span class="logo-mark" aria-hidden="true">
+        <svg viewBox="0 0 36 36" width="34" height="34" fill="none">
+          <circle cx="18" cy="18" r="16.5" stroke="currentColor" stroke-width="1.2" opacity="0.35" />
+          <circle cx="18" cy="18" r="12" fill="rgba(243,241,234,0.65)" />
+          <text
+            x="18"
+            y="22.5"
+            text-anchor="middle"
+            font-family="Noto Serif SC, Songti SC, serif"
+            font-size="14"
+            font-weight="600"
+            fill="currentColor">艺</text>
+        </svg>
+      </span>
+      <span class="logo-text">赵海蓺</span>
     </a>
 
     <nav class="nav desktop-nav" aria-label="主导航">
@@ -27,12 +42,15 @@ const items = [
           </a>
         ))
       }
-      <a class="btn btn-dark btn-sm nav-cta" href={path('/rss.xml')}>订阅</a>
+      <a class="btn btn-dark btn-sm nav-cta" href={resumeHref} download="赵海蓺-简历.pdf">下载简历</a>
     </nav>
 
-    <button class="menu-toggle" type="button" aria-label="打开菜单" aria-expanded="false" data-menu-toggle>
-      <span></span><span></span><span></span>
-    </button>
+    <div class="header-right-mobile">
+      <a class="btn btn-dark btn-sm resume-m" href={resumeHref} download="赵海蓺-简历.pdf">简历</a>
+      <button class="menu-toggle" type="button" aria-label="打开菜单" aria-expanded="false" data-menu-toggle>
+        <span></span><span></span><span></span>
+      </button>
+    </div>
   </div>
 
   <nav class="mobile-nav" aria-label="移动导航" data-mobile-nav hidden>
@@ -43,7 +61,8 @@ const items = [
         </a>
       ))
     }
-    <a href={path('/rss.xml')}>订阅 / RSS</a>
+    <a href={resumeHref} download="赵海蓺-简历.pdf">下载简历</a>
+    <a href={path('/login')} data-auth-link>登录写笔记</a>
   </nav>
 </header>
 
@@ -53,7 +72,7 @@ const items = [
     top: 0;
     z-index: 50;
     backdrop-filter: blur(16px) saturate(1.2);
-    background: rgba(243, 241, 234, 0.72);
+    background: rgba(243, 241, 234, 0.78);
     border-bottom: 1px solid transparent;
   }
   .site-header.is-solid {
@@ -73,13 +92,19 @@ const items = [
     font-weight: 700;
     font-size: 17px;
     letter-spacing: -0.02em;
+    color: var(--ink);
   }
   .logo-mark {
-    width: 30px;
-    height: 30px;
-    border-radius: 10px;
-    background: linear-gradient(145deg, #8b7cff 0%, #5b4dff 55%, #14b8a6 120%);
-    box-shadow: 0 8px 18px rgba(91, 77, 255, 0.28);
+    display: grid;
+    place-items: center;
+    color: #3d3a4a;
+    width: 34px;
+    height: 34px;
+  }
+  .logo-text {
+    font-family: var(--font-serif);
+    font-weight: 600;
+    letter-spacing: 0.02em;
   }
   .nav {
     display: flex;
@@ -104,8 +129,12 @@ const items = [
   .nav-cta {
     margin-left: 8px;
   }
-  .menu-toggle {
+  .header-right-mobile {
     display: none;
+    align-items: center;
+    gap: 8px;
+  }
+  .menu-toggle {
     width: 42px;
     height: 42px;
     border-radius: 12px;
@@ -116,6 +145,7 @@ const items = [
     justify-content: center;
     gap: 5px;
     cursor: pointer;
+    display: flex;
   }
   .menu-toggle span {
     display: block;
@@ -152,7 +182,7 @@ const items = [
     .desktop-nav {
       display: none;
     }
-    .menu-toggle {
+    .header-right-mobile {
       display: flex;
     }
   }

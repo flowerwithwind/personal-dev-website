@@ -1,0 +1,139 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { siteConfig } from '../data/site';
+import { path } from '../lib/paths';
+---
+
+<BaseLayout current="login" title="登录" description="作者登录后可添加笔记">
+  <div class="container wrap">
+    <div class="card">
+      <p class="kicker"><i></i> 作者入口</p>
+      <h1 class="serif">登录后写笔记</h1>
+      <p class="lead">
+        仅站主可发布笔记。验证通过后会在本机浏览器保持登录一段时间，然后进入写笔记面板。
+      </p>
+
+      <form class="form" data-login-form>
+        <label>
+          <span>密码</span>
+          <input type="password" name="password" autocomplete="current-password" required placeholder="输入作者密码" />
+        </label>
+        <p class="err" data-login-error hidden>密码不正确，请重试。</p>
+        <button class="btn btn-dark" type="submit">登录</button>
+      </form>
+
+      <p class="hint">
+        默认演示密码见站点 README。生产环境请修改 <code>siteConfig.adminPasswordSha256</code>。
+        笔记保存在你的浏览器本地（可导出 Markdown 纳入仓库）。
+      </p>
+      <a class="back" href={path('/')}>← 返回首页</a>
+    </div>
+  </div>
+</BaseLayout>
+
+<script define:vars={{ expectedHash: siteConfig.adminPasswordSha256, adminPath: path('/admin') }}>
+  import {
+    verifyPassword,
+    writeSession,
+    readSession,
+  } from '../lib/auth.ts';
+
+  if (readSession()) {
+    location.replace(adminPath);
+  }
+
+  const form = document.querySelector('[data-login-form]');
+  const err = document.querySelector('[data-login-error]');
+
+  form?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    err?.setAttribute('hidden', '');
+    const fd = new FormData(form);
+    const password = String(fd.get('password') || '');
+    const ok = await verifyPassword(password, expectedHash);
+    if (!ok) {
+      err?.removeAttribute('hidden');
+      return;
+    }
+    writeSession();
+    location.href = adminPath;
+  });
+</script>
+
+<style>
+  .wrap {
+    padding: 56px 0 72px;
+    display: grid;
+    place-items: center;
+  }
+  .card {
+    width: min(100%, 440px);
+    padding: 32px 28px;
+    border-radius: 24px;
+    background: rgba(255, 255, 255, 0.92);
+    border: 1px solid rgba(255, 255, 255, 0.85);
+    box-shadow: var(--shadow);
+    backdrop-filter: blur(12px);
+  }
+  .kicker {
+    margin: 0 0 14px;
+  }
+  h1 {
+    margin: 0 0 10px;
+    font-size: 30px;
+    font-weight: 600;
+  }
+  .lead {
+    margin: 0 0 22px;
+    color: var(--muted);
+    font-size: 14.5px;
+    font-weight: 500;
+  }
+  .form {
+    display: grid;
+    gap: 14px;
+  }
+  label {
+    display: grid;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink-soft);
+  }
+  input {
+    min-height: 46px;
+    border-radius: 12px;
+    border: 1px solid var(--line-strong);
+    background: #fff;
+    padding: 0 14px;
+  }
+  input:focus {
+    outline: none;
+    box-shadow: var(--focus);
+    border-color: rgba(91, 77, 255, 0.35);
+  }
+  .err {
+    margin: 0;
+    color: #b42318;
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .hint {
+    margin: 18px 0 12px;
+    font-size: 12.5px;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+  .hint code {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    background: rgba(12, 11, 16, 0.05);
+    padding: 1px 5px;
+    border-radius: 4px;
+  }
+  .back {
+    color: var(--accent);
+    font-size: 13.5px;
+    font-weight: 700;
+  }
+</style>

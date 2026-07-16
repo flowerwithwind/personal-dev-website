@@ -1,0 +1,132 @@
+---
+/** Decorative garden atmosphere: SVG art + soft orbs with scroll parallax */
+---
+
+<div class="atmosphere" aria-hidden="true" data-atmosphere>
+  <div class="orb orb-a" data-depth="0.12"></div>
+  <div class="orb orb-b" data-depth="0.2"></div>
+  <div class="orb orb-c" data-depth="0.08"></div>
+
+  <svg class="art art-left" data-depth="0.15" viewBox="0 0 280 420" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M40 380 C60 300 40 240 90 180 C130 130 100 90 120 40" stroke="rgba(15,159,138,0.22)" stroke-width="1.5" />
+    <path d="M90 180 C120 200 160 190 190 150" stroke="rgba(91,77,255,0.16)" stroke-width="1.2" />
+    <ellipse cx="120" cy="48" rx="28" ry="14" transform="rotate(-28 120 48)" fill="rgba(15,159,138,0.14)" />
+    <ellipse cx="148" cy="72" rx="22" ry="11" transform="rotate(18 148 72)" fill="rgba(91,77,255,0.12)" />
+    <ellipse cx="98" cy="88" rx="18" ry="9" transform="rotate(-12 98 88)" fill="rgba(244,114,182,0.1)" />
+    <circle cx="190" cy="150" r="6" fill="rgba(245,158,11,0.25)" />
+    <circle cx="206" cy="138" r="3.5" fill="rgba(91,77,255,0.2)" />
+    <path d="M70 260 C95 245 110 270 95 290 C80 305 60 285 70 260Z" fill="rgba(15,159,138,0.1)" />
+    <path d="M100 220 C125 205 145 230 125 250 C110 262 90 240 100 220Z" fill="rgba(91,77,255,0.08)" />
+  </svg>
+
+  <svg class="art art-right" data-depth="0.18" viewBox="0 0 300 460" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M220 40 C200 120 240 170 200 240 C170 290 210 330 190 400" stroke="rgba(91,77,255,0.14)" stroke-width="1.4" />
+    <path d="M200 240 C160 230 140 260 155 285" stroke="rgba(15,159,138,0.16)" stroke-width="1.1" />
+    <ellipse cx="188" cy="402" rx="32" ry="15" transform="rotate(24 188 402)" fill="rgba(244,114,182,0.1)" />
+    <ellipse cx="160" cy="378" rx="24" ry="12" transform="rotate(-20 160 378)" fill="rgba(91,77,255,0.1)" />
+    <ellipse cx="210" cy="370" rx="20" ry="10" transform="rotate(8 210 370)" fill="rgba(15,159,138,0.12)" />
+    <circle cx="155" cy="285" r="5" fill="rgba(245,158,11,0.22)" />
+    <path d="M230 120 C250 100 275 125 255 150 C240 165 215 145 230 120Z" fill="rgba(91,77,255,0.09)" />
+    <path d="M250 180 C270 165 290 190 270 210 C255 222 235 200 250 180Z" fill="rgba(15,159,138,0.09)" />
+  </svg>
+
+  <svg class="art art-mid" data-depth="0.06" viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M10 80 C40 40 70 100 100 50 C130 10 160 70 190 40" stroke="rgba(12,11,16,0.05)" stroke-width="1" stroke-dasharray="3 6" />
+  </svg>
+</div>
+
+<style>
+  .atmosphere {
+    pointer-events: none;
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+  }
+  .orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(40px);
+    will-change: transform;
+  }
+  .orb-a {
+    width: min(48vw, 520px);
+    height: min(48vw, 520px);
+    top: -8%;
+    left: -6%;
+    background: radial-gradient(circle, rgba(167, 139, 250, 0.35), transparent 68%);
+  }
+  .orb-b {
+    width: min(42vw, 460px);
+    height: min(42vw, 460px);
+    top: 18%;
+    right: -10%;
+    background: radial-gradient(circle, rgba(45, 212, 191, 0.28), transparent 70%);
+  }
+  .orb-c {
+    width: min(50vw, 560px);
+    height: min(50vw, 560px);
+    bottom: -12%;
+    left: 28%;
+    background: radial-gradient(circle, rgba(251, 191, 36, 0.16), transparent 72%);
+  }
+  .art {
+    position: absolute;
+    opacity: 0.95;
+    will-change: transform;
+  }
+  .art-left {
+    width: min(34vw, 280px);
+    left: -2%;
+    top: 22%;
+  }
+  .art-right {
+    width: min(36vw, 300px);
+    right: -4%;
+    bottom: 6%;
+  }
+  .art-mid {
+    width: min(40vw, 320px);
+    left: 50%;
+    top: 42%;
+    transform: translateX(-50%);
+    opacity: 0.7;
+  }
+  @media (max-width: 860px) {
+    .art-left,
+    .art-right {
+      opacity: 0.55;
+      width: 42vw;
+    }
+    .art-mid {
+      display: none;
+    }
+  }
+</style>
+
+<script>
+  const root = document.querySelector('[data-atmosphere]');
+  if (root && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const layers = root.querySelectorAll<HTMLElement>('[data-depth]');
+    let ticking = false;
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        const y = window.scrollY || 0;
+        layers.forEach((el) => {
+          const depth = Number(el.dataset.depth || 0.1);
+          const shift = y * depth;
+          if (el.classList.contains('art-mid')) {
+            el.style.transform = `translateX(-50%) translate3d(0, ${shift}px, 0)`;
+          } else {
+            el.style.transform = `translate3d(0, ${shift}px, 0)`;
+          }
+        });
+        ticking = false;
+      });
+    };
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+  }
+</script>

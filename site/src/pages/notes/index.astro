@@ -11,10 +11,15 @@ const chips = getNoteFilterChips();
 <BaseLayout current="notes" title="笔记" description="公开的思考与实验记录 · Digital Garden">
   <div class="container page">
     <header class="page-hero">
-      <h1 class="serif">笔记</h1>
-      <p>
-        公开的思考与实验记录。有些是完整文章，有些仍会继续修改——更接近 digital garden，而不是新闻博客。
-      </p>
+      <div class="hero-row">
+        <div>
+          <h1 class="serif">笔记</h1>
+          <p>
+            公开的思考与实验记录。有些是完整文章，有些仍会继续修改——更接近 digital garden，而不是新闻博客。
+          </p>
+        </div>
+        <a class="btn btn-dark btn-sm write-btn" href={path('/login')} data-write-note-btn>写笔记</a>
+      </div>
     </header>
 
     <div class="filters" role="toolbar" aria-label="笔记筛选" data-note-filters>
@@ -27,7 +32,7 @@ const chips = getNoteFilterChips();
       }
     </div>
 
-    <div class="list" data-note-list>
+    <div class="list" data-note-list data-local-base={path('/notes/local/')} data-admin-path={path('/admin')} data-login-path={path('/login')}>
       {
         notes.map((note) => (
           <a
@@ -55,6 +60,13 @@ const chips = getNoteFilterChips();
   .page-hero {
     padding: 48px 0 18px;
   }
+  .hero-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
   .page-hero h1 {
     font-size: 44px;
     font-weight: 600;
@@ -66,6 +78,9 @@ const chips = getNoteFilterChips();
     color: var(--muted);
     font-weight: 500;
     max-width: 560px;
+  }
+  .write-btn {
+    flex: 0 0 auto;
   }
   .filters {
     display: flex;
@@ -129,8 +144,36 @@ const chips = getNoteFilterChips();
 </style>
 
 <script>
+  import { readSession, readUserNotes } from '../../lib/auth.ts';
+
   const toolbar = document.querySelector('[data-note-filters]');
-  const list = document.querySelector('[data-note-list]');
+  const list = document.querySelector<HTMLElement>('[data-note-list]');
+  const writeBtn = document.querySelector<HTMLAnchorElement>('[data-write-note-btn]');
+  const localBase = list?.dataset.localBase || '/notes/local/';
+  const adminPath = list?.dataset.adminPath || '/admin';
+  const loginPath = list?.dataset.loginPath || '/login';
+
+  if (writeBtn) {
+    writeBtn.href = readSession() ? adminPath : loginPath;
+    writeBtn.textContent = readSession() ? '写笔记' : '登录写笔记';
+  }
+
+  if (list) {
+    const userNotes = readUserNotes();
+    userNotes.forEach((n) => {
+      const a = document.createElement('a');
+      a.className = 'item item-user';
+      a.href = `${localBase}?slug=${encodeURIComponent(n.slug)}`;
+      a.dataset.tags = [...n.filters, ...n.tags, n.categoryLabel, '本机'].join('|');
+      a.innerHTML = `<div><div class="cat">本机 · ${escapeHtml(n.categoryLabel)}</div><h2 class="serif">${escapeHtml(n.title)}</h2><p>${escapeHtml(n.summary)}</p></div><div class="date">${n.status === 'growing' ? '持续更新' : n.publishedAt}</div>`;
+      list.prepend(a);
+    });
+  }
+
+  function escapeHtml(s: string) {
+    return s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c] as string);
+  }
+
   if (toolbar && list) {
     toolbar.addEventListener('click', (e) => {
       const btn = (e.target as HTMLElement).closest<HTMLButtonElement>('[data-filter]');
