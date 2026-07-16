@@ -26,7 +26,14 @@ try {
   git remote add origin $repo
   git push -f origin gh-pages
   Write-Host "Pushed gh-pages to $repo"
-  Write-Host "Public URL: https://flowerwithwind.github.io/personal-dev-website/"
+  $cnamePath = Join-Path $tmp "CNAME"
+  if (Test-Path $cnamePath) {
+    $domain = (Get-Content $cnamePath -Raw).Trim()
+    Write-Host "Custom domain CNAME: $domain"
+    Write-Host "Public URL: https://$domain/"
+  } else {
+    Write-Host "Public URL: https://flowerwithwind.github.io/personal-dev-website/"
+  }
 } finally {
   Pop-Location
 }

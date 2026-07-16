@@ -1,4 +1,5 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://flowerwithwind.github.io/personal-dev-website/sitemap-index.xml
+# Sitemap URL follows current host (github.io or custom domain)
+Sitemap: /sitemap-index.xml
