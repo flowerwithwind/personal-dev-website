@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>02 · 笔记列表 — 设计原型</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&family=Noto+Serif+SC:wght@500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="shared.css" />
+<style>
+  .page-hero { padding: 48px 0 18px; }
+  .page-hero h1 {
+    font-family: var(--font-serif);
+    font-size: 44px; font-weight: 600; letter-spacing: -0.02em; margin-bottom: 10px;
+  }
+  .page-hero p { color: var(--muted); font-weight: 500; max-width: 560px; }
+  .filters { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0 22px; }
+  .list { display: grid; gap: 12px; max-width: 900px; }
+  .item {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 16px;
+    padding: 18px 20px;
+    background: rgba(255,255,255,0.9);
+    border: 1px solid rgba(255,255,255,0.75);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+    backdrop-filter: blur(8px);
+  }
+  .item .cat { font-size: 12px; font-weight: 700; color: var(--accent); margin-bottom: 6px; }
+  .item h2 {
+    font-family: var(--font-serif);
+    font-size: 20px; font-weight: 600; letter-spacing: -0.015em; margin-bottom: 8px;
+  }
+  .item p { color: var(--muted); font-size: 14px; font-weight: 500; }
+  .item .date { font-size: 12px; font-weight: 600; color: rgba(12,11,16,0.4); white-space: nowrap; padding-top: 2px; }
+  .seed { color: #b45309; }
+</style>
+</head>
+<body>
+  <div class="page">
+    <div class="proto-bar"><div>02 · NOTES LIST</div><span>Digital Garden · 标签筛选</span></div>
+    <header class="site-header is-solid">
+      <div class="header-inner">
+        <a class="logo" href="01-home.html"><span class="logo-mark"></span>赵海蓺</a>
+        <nav class="nav">
+          <a href="01-home.html">首页</a>
+          <a class="is-active" href="02-notes.html">笔记</a>
+          <a href="04-projects.html">项目</a>
+          <a href="06-about.html">关于</a>
+          <a class="btn btn-dark btn-sm" href="#" style="margin-left:8px;">订阅</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="container">
+      <div class="page-hero">
+        <h1>笔记</h1>
+        <p>公开的思考与实验记录。有些是完整文章，有些仍会继续修改——更接近 digital garden，而不是新闻博客。</p>
+      </div>
+      <div class="filters">
+        <span class="chip is-active">全部</span>
+        <span class="chip">Agent</span>
+        <span class="chip">RAG</span>
+        <span class="chip">工程</span>
+        <span class="chip">阅读札记</span>
+        <span class="chip">随笔</span>
+      </div>
+      <div class="list">
+        <a class="item" href="03-note-detail.html">
+          <div>
+            <div class="cat">Essay · Agent</div>
+            <h2>把 Code Review 做成 Agent，而不是把 Diff 丢给大模型</h2>
+            <p>上下文裁剪、规范检索、失败回退与协作流回写——从脚本到系统的路径。</p>
+          </div>
+          <div class="date">2026-07-12</div>
+        </a>
+        <a class="item" href="03-note-detail.html">
+          <div>
+            <div class="cat">Note · RAG</div>
+            <h2>NL2SQL 失败时，检索应发生在哪一层？</h2>
+            <p>意图、Schema、样例与自纠错的分层兜底策略。</p>
+          </div>
+          <div class="date">2026-07-03</div>
+        </a>
+        <a class="item" href="03-note-detail.html">
+          <div>
+            <div class="cat">Journal</div>
+            <h2>本周札记：可观测性与 Agent 调试</h2>
+            <p>日志字段如何同时服务排错与对外讲述。</p>
+          </div>
+          <div class="date">2026-06-28</div>
+        </a>
+        <a class="item" href="03-note-detail.html">
+          <div>
+            <div class="cat">Reading</div>
+            <h2>读《Building LLM Apps》时划下的三处</h2>
+            <p>评估、缓存与人机回路：摘录 + 我的批注。</p>
+          </div>
+          <div class="date">2026-06-15</div>
+        </a>
+        <a class="item" href="03-note-detail.html">
+          <div>
+            <div class="cat seed">Garden · Seed</div>
+            <h2>（生长中）个人知识库公开化的边界</h2>
+            <p>哪些笔记适合公开，哪些应永远留在私有库——还在想。</p>
+          </div>
+          <div class="date">持续更新</div>
+        </a>
+      </div>
+    </main>
+
+    <footer class="site-footer">
+      <div class="footer-bottom" style="border:0;padding-top:0;">
+        <span>© 2026 · Notes Prototype</span>
+        <a class="more" href="01-home.html">← 首页</a>
+      </div>
+    </footer>
+  </div>
+</body>
+</html>

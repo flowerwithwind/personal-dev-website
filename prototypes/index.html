@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>赵海蓺 · AI Agent / 全栈开发者</title>
+  <meta name="description" content="个人开发者网站高保真原型 — 展示 AI Agent、智能问数与全栈工程能力。" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="logo" href="index.html">
+        <span class="logo-mark">ZH</span>
+        <span>Zhao Haiyi</span>
+      </a>
+      <nav class="nav" aria-label="主导航">
+        <a class="is-active" href="index.html">首页</a>
+        <a href="projects.html">项目</a>
+        <a href="about.html">关于</a>
+        <a href="contact.html">联系</a>
+      </nav>
+      <div class="header-actions">
+        <button class="icon-btn" type="button" data-theme-toggle aria-label="切换主题"></button>
+        <a class="btn btn-ghost" href="#resume">简历</a>
+        <button class="icon-btn menu-toggle" type="button" aria-label="打开菜单" aria-expanded="false">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <div class="mobile-nav" hidden>
+    <a class="is-active" href="index.html">首页</a>
+    <a href="projects.html">项目</a>
+    <a href="about.html">关于</a>
+    <a href="contact.html">联系</a>
+    <a href="#resume">下载简历</a>
+  </div>
+
+  <main>
+    <section class="hero">
+      <div class="container hero-grid">
+        <div>
+          <div class="eyebrow">Open to Intern / Full-time · 2026</div>
+          <h1>
+            你好，我是 <span class="highlight">赵海蓺</span><br />
+            构建可落地的 AI Agent 系统
+          </h1>
+          <p class="hero-lead">
+            全栈开发者，专注 LLM Agent、RAG 与工程化交付。从代码评审、智能问数到多智能体平台，把模型能力做成可部署、可观测的产品。
+          </p>
+          <div class="hero-cta">
+            <a class="btn btn-primary" href="projects.html">查看精选项目</a>
+            <a class="btn btn-ghost" href="contact.html">联系我</a>
+          </div>
+          <div class="hero-meta">
+            <span><strong>Focus</strong> · Agent / RAG / Full-stack</span>
+            <span><strong>Stack</strong> · Python · Vue/React · FastAPI</span>
+            <span><strong>Based</strong> · China</span>
+          </div>
+        </div>
+
+        <aside class="hero-panel" aria-label="能力速览">
+          <div class="hero-panel-inner">
+            <div class="terminal-bar" aria-hidden="true">
+              <span class="terminal-dot"></span>
+              <span class="terminal-dot"></span>
+              <span class="terminal-dot"></span>
+            </div>
+            <div class="code-block">
+              <div><span class="c">// building systems that ship</span></div>
+              <div><span class="k">const</span> me = {</div>
+              <div>  role: <span class="s">"AI Agent Engineer"</span>,</div>
+              <div>  shipping: [<span class="s">"Review Agent"</span>, <span class="s">"NL2SQL"</span>, <span class="s">"AgentOS"</span>],</div>
+              <div>  beliefs: [<span class="s">"show evidence"</span>, <span class="s">"ship iteratively"</span>]</div>
+              <div>};</div>
+              <div class="c">// available for ByteIntern / Code AI roles</div>
+            </div>
+            <div class="stat-row">
+              <div class="stat-card"><span class="num">3</span><span class="lbl">Core Projects</span></div>
+              <div class="stat-card"><span class="num">AI</span><span class="lbl">Agent + RAG</span></div>
+              <div class="stat-card"><span class="num">FS</span><span class="lbl">Full Stack</span></div>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="section" id="projects" style="padding-top: 24px;">
+      <div class="container">
+        <div class="section-label">01 — Projects</div>
+        <h2 class="section-title">精选项目</h2>
+        <p class="section-desc">以可运行系统证明能力：每个项目包含问题定义、技术方案与工程交付路径。</p>
+
+        <div class="cards-3">
+          <a class="project-card" href="project-detail.html">
+            <div class="project-cover">
+              <span class="cover-badge">Featured</span>
+              <div class="cover-icon">CR</div>
+            </div>
+            <div class="project-body">
+              <h3>Code Review Agent</h3>
+              <p>基于 LLM + Agent + RAG 的智能代码评审系统，自动解析 PR Diff，输出多维度审查报告与 GitHub Comment。</p>
+              <div class="tag-row">
+                <span class="tag">Python</span>
+                <span class="tag">Agent</span>
+                <span class="tag">RAG</span>
+                <span class="tag">FastAPI</span>
+              </div>
+              <div class="card-footer">
+                <span>2026</span>
+                <span class="card-link">查看案例 →</span>
+              </div>
+            </div>
+          </a>
+
+          <a class="project-card" href="projects.html">
+            <div class="project-cover">
+              <span class="cover-badge">Data AI</span>
+              <div class="cover-icon">QA</div>
+            </div>
+            <div class="project-body">
+              <h3>智能问数 Wenshu</h3>
+              <p>NL2SQL + RAG + ReAct Agent：自然语言查询电商数据，自动生成 SQL、执行分析并可视化结果。</p>
+              <div class="tag-row">
+                <span class="tag">Vue 3</span>
+                <span class="tag">LangChain</span>
+                <span class="tag">NL2SQL</span>
+                <span class="tag">ChromaDB</span>
+              </div>
+              <div class="card-footer">
+                <span>2026</span>
+                <span class="card-link">查看案例 →</span>
+              </div>
+            </div>
+          </a>
+
+          <a class="project-card" href="projects.html">
+            <div class="project-cover">
+              <span class="cover-badge">Platform</span>
+              <div class="cover-icon">OS</div>
+            </div>
+            <div class="project-body">
+              <h3>XHAgentOS</h3>
+              <p>面向智能瞭望与问数的 Agent 平台：会话、知识库、技能、工作流与监控等多模块一体化。</p>
+              <div class="tag-row">
+                <span class="tag">Full-stack</span>
+                <span class="tag">Workflow</span>
+                <span class="tag">Knowledge</span>
+                <span class="tag">React</span>
+              </div>
+              <div class="card-footer">
+                <span>2026</span>
+                <span class="card-link">查看案例 →</span>
+              </div>
+            </div>
+          </a>
+        </div>
+
+        <div class="mt-40" style="text-align:center;">
+          <a class="btn btn-secondary" href="projects.html">浏览全部项目</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" style="padding-top: 0;">
+      <div class="container">
+        <div class="section-label">02 — Strengths</div>
+        <h2 class="section-title">我如何交付价值</h2>
+        <p class="section-desc">不只是调用模型 API，而是把 Agent 做成可评审、可部署、可迭代的工程系统。</p>
+        <div class="cards-3">
+          <article class="feature-card">
+            <div class="feature-icon">01</div>
+            <h3>Agent 系统设计</h3>
+            <p>工具调用、分阶段流水线、RAG 增强与失败回退，让智能体在真实任务中稳定完成闭环。</p>
+          </article>
+          <article class="feature-card">
+            <div class="feature-icon">02</div>
+            <h3>全栈产品化</h3>
+            <p>FastAPI / Vue / React 前后端协同，Webhook、鉴权、可视化与 Docker 部署一并打通。</p>
+          </article>
+          <article class="feature-card">
+            <div class="feature-icon">03</div>
+            <h3>工程与可观测</h3>
+            <p>日志、限流、任务队列、测试与文档齐全，方便协作评审与二次演进。</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" style="padding-top: 0;">
+      <div class="container">
+        <div class="cta-band">
+          <div>
+            <div class="section-label">03 — About</div>
+            <h2>用作品说话，也用系统思维解决问题</h2>
+            <p>我享受把模糊需求拆成可验证里程碑：从数据与提示词到接口与 UI，最终交付可演示的完整链路。</p>
+          </div>
+          <div style="display:flex; gap:12px; flex-wrap:wrap;">
+            <a class="btn btn-primary" href="about.html">了解更多</a>
+            <a class="btn btn-ghost" href="contact.html">开始对话</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-sm" id="resume">
+      <div class="container">
+        <div class="cta-band" style="background: var(--bg-muted);">
+          <div>
+            <h2 style="font-size:22px; margin:0 0 8px;">准备好深入了解？</h2>
+            <p>下载简历，或直接发送邮件讨论实习 / 全职机会与技术交流。</p>
+          </div>
+          <div style="display:flex; gap:12px; flex-wrap:wrap;">
+            <a class="btn btn-primary" href="#" onclick="alert('原型阶段：请替换为真实 resume.pdf'); return false;">下载简历 PDF</a>
+            <a class="btn btn-secondary" href="mailto:hello@example.com">hello@example.com</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-inner">
+        <div class="footer-brand">
+          <a class="logo" href="index.html">
+            <span class="logo-mark">ZH</span>
+            <span>Zhao Haiyi</span>
+          </a>
+          <p>个人开发者网站高保真原型 · 面向求职与技术展示。</p>
+        </div>
+        <div class="footer-cols">
+          <div class="footer-col">
+            <h4>导航</h4>
+            <a href="index.html">首页</a>
+            <a href="projects.html">项目</a>
+            <a href="about.html">关于</a>
+            <a href="contact.html">联系</a>
+          </div>
+          <div class="footer-col">
+            <h4>社交</h4>
+            <a href="#" rel="noopener">GitHub</a>
+            <a href="mailto:hello@example.com">Email</a>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© 2026 Zhao Haiyi. Prototype for portfolio design review.</span>
+        <span class="muted">Built with HTML / CSS / JS</span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // unhide mobile nav container for progressive enhancement
+    document.querySelector(".mobile-nav")?.removeAttribute("hidden");
+  </script>
+  <script src="js/main.js"></script>
+</body>
+</html>

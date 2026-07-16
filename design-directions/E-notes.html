@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>方向 E · 笔记列表页原型</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700&family=Noto+Serif+SC:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #f4f4ef;
+    --ink: #09090b;
+    --muted: rgba(0,0,0,0.52);
+    --line: rgba(0,0,0,0.08);
+    --accent: #5b4dff;
+    --font-sans: "Inter", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+    --font-serif: "Noto Serif SC", "Source Han Serif SC", serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: var(--font-sans);
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.7;
+  }
+  a { color: inherit; text-decoration: none; }
+  .frame { max-width: 960px; margin: 0 auto; min-height: 100vh; padding-bottom: 48px; }
+  .badge {
+    padding: 10px 24px; background: #111113; color: #c4c0ff;
+    font-size: 12px; font-weight: 600; letter-spacing: 0.04em;
+  }
+  header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 18px 24px; position: sticky; top: 0;
+    background: rgba(244,244,239,0.9); backdrop-filter: blur(12px);
+  }
+  .logo { font-weight: 700; display: flex; gap: 10px; align-items: center; }
+  .logo i {
+    width: 28px; height: 28px; border-radius: 9px; display: block;
+    background: linear-gradient(145deg, #7c6fff, #5b4dff 60%, #14b8a6);
+  }
+  nav { display: flex; gap: 4px; color: var(--muted); font-size: 14px; font-weight: 600; }
+  nav a { padding: 8px 12px; border-radius: 999px; }
+  nav a.active { color: var(--ink); background: rgba(0,0,0,0.06); }
+
+  .page-head { padding: 40px 24px 20px; }
+  .page-head h1 {
+    font-family: var(--font-serif);
+    font-size: 42px; font-weight: 600; letter-spacing: -0.02em; margin-bottom: 10px;
+  }
+  .page-head p { color: var(--muted); font-weight: 500; max-width: 520px; }
+
+  .filters {
+    display: flex; flex-wrap: wrap; gap: 8px; padding: 0 24px 20px;
+  }
+  .chip {
+    border: 1px solid var(--line); background: #fff; border-radius: 999px;
+    padding: 7px 12px; font-size: 13px; font-weight: 600; color: var(--muted);
+  }
+  .chip.active { background: #111; color: #fff; border-color: #111; }
+
+  .list { padding: 0 24px; display: grid; gap: 12px; }
+  .item {
+    background: #fff; border: 1px solid var(--line); border-radius: 18px;
+    padding: 18px 20px; display: grid; grid-template-columns: 1fr auto; gap: 12px;
+    align-items: start;
+  }
+  .item:hover { box-shadow: 0 12px 30px rgba(15,15,20,0.06); }
+  .item .cat { font-size: 12px; font-weight: 700; color: var(--accent); margin-bottom: 6px; }
+  .item h2 {
+    font-family: var(--font-serif);
+    font-size: 20px; font-weight: 600; letter-spacing: -0.015em; margin-bottom: 8px;
+  }
+  .item p { color: var(--muted); font-size: 14px; font-weight: 500; }
+  .item .date {
+    font-size: 12px; font-weight: 600; color: rgba(0,0,0,0.4); white-space: nowrap;
+  }
+
+  .back {
+    display: inline-block; margin: 28px 24px 0; color: var(--accent); font-weight: 700; font-size: 14px;
+  }
+</style>
+</head>
+<body>
+  <div class="frame">
+    <div class="badge">DIRECTION E · NOTES LIST — 个人笔记是一等公民，不只是博客附属</div>
+    <header>
+      <a class="logo" href="E-personal-soft.html"><i></i>赵海蓺</a>
+      <nav>
+        <a href="E-personal-soft.html">首页</a>
+        <a class="active" href="E-notes.html">笔记</a>
+        <a href="#">项目</a>
+        <a href="#">关于</a>
+      </nav>
+    </header>
+
+    <div class="page-head">
+      <h1>笔记</h1>
+      <p>公开的思考与实验记录。有些是完整文章，有些仍会继续修改——更接近 digital garden，而不是新闻博客。</p>
+    </div>
+
+    <div class="filters">
+      <span class="chip active">全部</span>
+      <span class="chip">Agent</span>
+      <span class="chip">RAG</span>
+      <span class="chip">工程</span>
+      <span class="chip">阅读札记</span>
+      <span class="chip">随笔</span>
+    </div>
+
+    <div class="list">
+      <article class="item">
+        <div>
+          <div class="cat">Essay · Agent</div>
+          <h2>把 Code Review 做成 Agent，而不是把 Diff 丢给大模型</h2>
+          <p>上下文裁剪、规范检索、失败回退与协作流回写——从脚本到系统的路径。</p>
+        </div>
+        <div class="date">2026-07-12</div>
+      </article>
+      <article class="item">
+        <div>
+          <div class="cat">Note · RAG</div>
+          <h2>NL2SQL 失败时，检索应发生在哪一层？</h2>
+          <p>意图、Schema、样例与自纠错的分层兜底策略。</p>
+        </div>
+        <div class="date">2026-07-03</div>
+      </article>
+      <article class="item">
+        <div>
+          <div class="cat">Journal</div>
+          <h2>本周札记：可观测性与 Agent 调试</h2>
+          <p>日志字段如何同时服务排错与对外讲述。</p>
+        </div>
+        <div class="date">2026-06-28</div>
+      </article>
+      <article class="item">
+        <div>
+          <div class="cat">Reading</div>
+          <h2>读《Building LLM Apps》时划下的三处</h2>
+          <p>评估、缓存与人机回路：摘录 + 我的批注。</p>
+        </div>
+        <div class="date">2026-06-15</div>
+      </article>
+      <article class="item">
+        <div>
+          <div class="cat">Garden · Seed</div>
+          <h2>（生长中）个人知识库公开化的边界</h2>
+          <p>哪些笔记适合公开，哪些应永远留在私有库——还在想。</p>
+        </div>
+        <div class="date">持续更新</div>
+      </article>
+    </div>
+
+    <a class="back" href="E-personal-soft.html">← 返回首页方向稿</a>
+  </div>
+</body>
+</html>

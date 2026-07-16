@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>04 · 项目列表 — 设计原型</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&family=Noto+Serif+SC:wght@500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="shared.css" />
+<style>
+  .page-hero { padding: 48px 0 18px; }
+  .page-hero h1 {
+    font-family: var(--font-serif);
+    font-size: 44px; font-weight: 600; letter-spacing: -0.02em; margin-bottom: 10px;
+  }
+  .page-hero p { color: var(--muted); font-weight: 500; max-width: 560px; }
+  .filters { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 22px; }
+  .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+  .project {
+    overflow: hidden;
+    background: rgba(255,255,255,0.9);
+    border: 1px solid rgba(255,255,255,0.75);
+    border-radius: 22px;
+    box-shadow: var(--shadow-sm);
+    backdrop-filter: blur(8px);
+  }
+  .thumb {
+    height: 150px; display: grid; place-items: center;
+    font-family: var(--font-serif); font-size: 28px; font-weight: 700; color: #fff;
+    position: relative;
+  }
+  .thumb::after {
+    content: "";
+    position: absolute; inset: 0;
+    background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2), transparent 45%);
+  }
+  .p1 .thumb { background: linear-gradient(135deg, #7c6fff, #4f46e5); }
+  .p2 .thumb { background: linear-gradient(135deg, #2dd4bf, #0f766e); }
+  .p3 .thumb { background: linear-gradient(135deg, #fbbf24, #ea580c); }
+  .p4 .thumb { background: linear-gradient(135deg, #94a3b8, #64748b); }
+  .body { padding: 18px 18px 20px; }
+  .body h3 { font-size: 18px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 8px; }
+  .body p { color: var(--muted); font-size: 14px; font-weight: 500; min-height: 64px; margin-bottom: 12px; }
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+  .foot { display: flex; justify-content: space-between; font-size: 13px; font-weight: 600; color: rgba(12,11,16,0.4); }
+  .foot .go { color: var(--accent); }
+  @media (max-width: 860px) { .grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+  <div class="page">
+    <div class="proto-bar"><div>04 · PROJECTS</div><span>实践证据 · 与笔记互链</span></div>
+    <header class="site-header is-solid">
+      <div class="header-inner">
+        <a class="logo" href="01-home.html"><span class="logo-mark"></span>赵海蓺</a>
+        <nav class="nav">
+          <a href="01-home.html">首页</a>
+          <a href="02-notes.html">笔记</a>
+          <a class="is-active" href="04-projects.html">项目</a>
+          <a href="06-about.html">关于</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="container" style="padding-bottom:48px;">
+      <div class="page-hero">
+        <h1>项目与实验</h1>
+        <p>可运行的系统与原型。它们支撑笔记里的判断，也欢迎直接打开仓库阅读。</p>
+      </div>
+      <div class="filters">
+        <span class="chip is-active">全部</span>
+        <span class="chip">AI Agent</span>
+        <span class="chip">数据智能</span>
+        <span class="chip">全栈平台</span>
+      </div>
+      <div class="grid">
+        <a class="project p1" href="05-project-detail.html">
+          <div class="thumb">评审</div>
+          <div class="body">
+            <h3>Code Review Agent</h3>
+            <p>LLM + Agent + RAG 智能代码评审：解析 PR Diff，输出多维报告并回写 GitHub Comment。</p>
+            <div class="tags"><span class="tag">Python</span><span class="tag">Agent</span><span class="tag">RAG</span><span class="tag">FastAPI</span></div>
+            <div class="foot"><span>2026</span><span class="go">查看案例 →</span></div>
+          </div>
+        </a>
+        <a class="project p2" href="05-project-detail.html">
+          <div class="thumb">问数</div>
+          <div class="body">
+            <h3>智能问数 Wenshu</h3>
+            <p>NL2SQL + ReAct：自然语言查询电商数据，执行分析并可视化。</p>
+            <div class="tags"><span class="tag">Vue 3</span><span class="tag">NL2SQL</span><span class="tag">LangChain</span></div>
+            <div class="foot"><span>2026</span><span class="go">查看案例 →</span></div>
+          </div>
+        </a>
+        <a class="project p3" href="05-project-detail.html">
+          <div class="thumb">平台</div>
+          <div class="body">
+            <h3>XHAgentOS</h3>
+            <p>智能瞭望与问数 Agent 平台：会话、知识库、技能、工作流与监控。</p>
+            <div class="tags"><span class="tag">React</span><span class="tag">Workflow</span><span class="tag">Full-stack</span></div>
+            <div class="foot"><span>2026</span><span class="go">查看案例 →</span></div>
+          </div>
+        </a>
+        <div class="project p4">
+          <div class="thumb">+</div>
+          <div class="body">
+            <h3>更多实验位</h3>
+            <p>保持精选。后续可补充小工具、课程作业精品或可视化实验。</p>
+            <div class="tags"><span class="tag">Coming soon</span></div>
+            <div class="foot"><span>规划中</span><span>拒绝注水</span></div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</body>
+</html>

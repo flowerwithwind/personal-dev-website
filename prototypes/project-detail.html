@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Code Review Agent · 项目详情</title>
+  <meta name="description" content="Code Review Agent 案例：LLM + Agent + RAG 智能代码评审系统的问题、方案、技术与成果。" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="logo" href="index.html">
+        <span class="logo-mark">ZH</span>
+        <span>Zhao Haiyi</span>
+      </a>
+      <nav class="nav" aria-label="主导航">
+        <a href="index.html">首页</a>
+        <a class="is-active" href="projects.html">项目</a>
+        <a href="about.html">关于</a>
+        <a href="contact.html">联系</a>
+      </nav>
+      <div class="header-actions">
+        <button class="icon-btn" type="button" data-theme-toggle aria-label="切换主题"></button>
+        <a class="btn btn-ghost" href="index.html#resume">简历</a>
+        <button class="icon-btn menu-toggle" type="button" aria-label="打开菜单" aria-expanded="false">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <div class="mobile-nav">
+    <a href="index.html">首页</a>
+    <a class="is-active" href="projects.html">项目</a>
+    <a href="about.html">关于</a>
+    <a href="contact.html">联系</a>
+  </div>
+
+  <main>
+    <section class="page-hero">
+      <div class="container">
+        <div class="breadcrumb">
+          <a href="index.html">Home</a>
+          <span>/</span>
+          <a href="projects.html">Projects</a>
+          <span>/</span>
+          <span>code-review-agent</span>
+        </div>
+
+        <div class="detail-hero">
+          <div>
+            <div class="tag-row" style="margin-bottom:14px;">
+              <span class="tag">Featured</span>
+              <span class="tag tag-muted">AI Agent</span>
+              <span class="tag tag-muted">2026</span>
+            </div>
+            <h1>Code Review Agent</h1>
+            <p>
+              面向 GitHub Pull Request 的智能代码评审 Agent。自动解析 Diff，结合 RAG 规范与历史经验，完成多维度审查并生成结构化报告与 PR 评论。
+            </p>
+            <div class="link-row mt-24">
+              <a class="btn btn-primary" href="#">GitHub Repo</a>
+              <a class="btn btn-ghost" href="#">API Docs</a>
+              <a class="btn btn-secondary" href="projects.html">返回列表</a>
+            </div>
+          </div>
+
+          <aside class="detail-meta" aria-label="项目元信息">
+            <div class="detail-meta-row"><span>角色</span><strong>独立设计与实现</strong></div>
+            <div class="detail-meta-row"><span>周期</span><strong>2026</strong></div>
+            <div class="detail-meta-row"><span>类型</span><strong>Agent 系统 / 后端</strong></div>
+            <div class="detail-meta-row"><span>状态</span><strong>可本地 / Docker 部署</strong></div>
+            <div class="detail-meta-row"><span>目标岗位映射</span><strong>Code AI / Coding Agent</strong></div>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" style="padding-top: 0;">
+      <div class="container" style="max-width: 900px;">
+        <article class="content-block">
+          <h2>01 · 问题背景</h2>
+          <p>
+            人工 Code Review 成本高、反馈慢，且质量依赖评审者经验。现有「只贴 Diff 给大模型」的方式存在上下文不足、规范不一致、token 失控与无法接入协作流程等问题。
+          </p>
+          <p>
+            本项目要回答：如何把 LLM 审查做成<strong>可触发、可增量、可回写 GitHub、可被规范知识增强</strong>的工程系统，而不是一次性 Demo 脚本。
+          </p>
+        </article>
+
+        <article class="content-block">
+          <h2>02 · 解决方案</h2>
+          <p>采用「Webhook / API / CLI 多入口 + 审查引擎 + RAG 知识增强」的分层架构：</p>
+          <div class="arch-box">GitHub PR Event
+  → Webhook 校验
+  → Diff 解析 / 语言过滤
+  → 分块 & 增量审查（控 token）
+  → RAG：规范 / 历史 Review / 最佳实践
+  → LLM 多维度评分与建议
+  → 结构化报告 + PR Comment
+  → 任务状态可查询</div>
+        </article>
+
+        <article class="content-block">
+          <h2>03 · 我的贡献</h2>
+          <ul>
+            <li>设计审查流水线：Diff 解析、语言感知过滤、分块增量策略，控制成本与覆盖面。</li>
+            <li>实现 RAG 增强链路：规范文档、历史评审与最佳实践检索，提高建议可操作性。</li>
+            <li>打通 GitHub Webhook、REST API 与 CLI，支持本地调试与服务化部署。</li>
+            <li>输出结构化报告模板与 PR 评论，使结果可直接进入协作流程。</li>
+            <li>补充 Docker / conda 环境约定与测试夹具，降低复现成本。</li>
+          </ul>
+        </article>
+
+        <article class="content-block">
+          <h2>04 · 技术栈</h2>
+          <div class="tag-row">
+            <span class="tag">Python</span>
+            <span class="tag">FastAPI</span>
+            <span class="tag">LLM Agent</span>
+            <span class="tag">RAG</span>
+            <span class="tag">ChromaDB</span>
+            <span class="tag">DeepSeek</span>
+            <span class="tag">GitHub API</span>
+            <span class="tag">Docker</span>
+            <span class="tag">Pytest</span>
+          </div>
+        </article>
+
+        <article class="content-block">
+          <h2>05 · 成果与亮点</h2>
+          <div class="highlight-grid">
+            <div class="highlight-item">
+              <strong>多维度审查</strong>
+              <span>正确性 / 安全 / 性能 / 可维护性 / 风格，输出结构化结果而非空泛摘要。</span>
+            </div>
+            <div class="highlight-item">
+              <strong>工程闭环</strong>
+              <span>从触发、排队、审查到评论回写形成完整链路，支持服务化运行。</span>
+            </div>
+            <div class="highlight-item">
+              <strong>成本可控</strong>
+              <span>增量与分块策略减少无关上下文，适配真实 PR 体量。</span>
+            </div>
+            <div class="highlight-item">
+              <strong>可演示可部署</strong>
+              <span>本地 conda、脚本与 Docker Compose 多路径启动，便于面试现场讲解。</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="content-block">
+          <h2>06 · 反思与下一步</h2>
+          <ul>
+            <li>可增强：仓库级规则配置、语言插件化、评审质量在线评估。</li>
+            <li>可增强：与 CI 门禁结合（仅对高风险问题阻断）。</li>
+            <li>叙事建议：面试中用一次真实 PR Diff 走完整链路，展示可观测日志与报告。</li>
+          </ul>
+        </article>
+
+        <div class="cta-band mt-40">
+          <div>
+            <h2 style="font-size:22px;margin:0 0 8px;">想看更多案例？</h2>
+            <p>智能问数与 XHAgentOS 展示了数据智能与平台化另一面能力。</p>
+          </div>
+          <a class="btn btn-primary" href="projects.html">全部项目</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-bottom" style="border:0; padding-top:0;">
+        <span>© 2026 Zhao Haiyi · Case Study Prototype</span>
+        <a href="contact.html">联系讨论这个项目 →</a>
+      </div>
+    </div>
+  </footer>
+  <script src="js/main.js"></script>
+</body>
+</html>

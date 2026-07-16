@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>01 · 首页 — 个人网站设计原型</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&family=Noto+Serif+SC:wght@500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="shared.css" />
+<style>
+  .hero {
+    padding: 72px 0 36px;
+    text-align: center;
+    position: relative;
+  }
+  .hero::before {
+    content: "";
+    position: absolute;
+    left: 50%; top: 8%;
+    transform: translateX(-50%);
+    width: min(720px, 90%);
+    height: 280px;
+    background: radial-gradient(closest-side, rgba(255,255,255,0.55), transparent 72%);
+    pointer-events: none;
+    z-index: 0;
+  }
+  .hero > * { position: relative; z-index: 1; }
+  .hero h1 {
+    font-family: var(--font-serif);
+    font-size: clamp(40px, 5.2vw, 58px);
+    font-weight: 600;
+    line-height: 1.14;
+    letter-spacing: -0.02em;
+    margin: 18px auto 16px;
+    max-width: 820px;
+  }
+  .hero h1 .soft { display: block; color: rgba(12,11,16,0.72); }
+  .lead {
+    max-width: 540px;
+    margin: 0 auto 26px;
+    color: var(--ink-soft);
+    font-size: 17px;
+    font-weight: 500;
+  }
+  .cta { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; margin-bottom: 22px; }
+  .hero-tags { display: flex; justify-content: center; flex-wrap: wrap; gap: 8px; }
+  .hero-tags span {
+    font-size: 12.5px; font-weight: 600; color: var(--muted);
+    background: rgba(255,255,255,0.7); border: 1px solid var(--line);
+    border-radius: 999px; padding: 6px 11px; backdrop-filter: blur(6px);
+  }
+
+  .now {
+    margin: 8px auto 28px;
+    width: min(100% - 48px, var(--max));
+    padding: 22px 24px;
+    display: grid;
+    grid-template-columns: 120px 1fr;
+    gap: 16px;
+    align-items: start;
+    background: rgba(255,255,255,0.86);
+    border: 1px solid rgba(255,255,255,0.8);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+    backdrop-filter: blur(12px);
+  }
+  .now h2 {
+    font-family: var(--font-serif);
+    font-size: 24px; font-weight: 600;
+  }
+  .now-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 20px; }
+  .now-item {
+    display: flex; gap: 10px; align-items: baseline;
+    font-size: 14px; font-weight: 500; color: var(--ink-soft);
+  }
+  .now-item b {
+    font-size: 11.5px; font-weight: 700; color: var(--accent);
+    background: var(--accent-soft); border-radius: 999px; padding: 3px 9px;
+  }
+
+  .notes {
+    display: grid;
+    grid-template-columns: 1.25fr 1fr;
+    gap: 14px;
+  }
+  .note {
+    padding: 20px;
+    min-height: 168px;
+    display: flex; flex-direction: column;
+    background: rgba(255,255,255,0.9);
+    border: 1px solid rgba(255,255,255,0.75);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+  }
+  .note.big {
+    grid-row: span 2;
+    background:
+      radial-gradient(480px 220px at 100% 0%, rgba(91,77,255,0.1), transparent 60%),
+      rgba(255,255,255,0.92);
+  }
+  .note .cat { font-size: 12px; font-weight: 700; color: var(--accent); margin-bottom: 10px; }
+  .note h3 {
+    font-family: var(--font-serif);
+    font-size: 20px; font-weight: 600; line-height: 1.35;
+    letter-spacing: -0.015em; margin-bottom: 10px;
+  }
+  .note.big h3 { font-size: 26px; }
+  .note p { color: var(--muted); font-size: 14px; font-weight: 500; flex: 1; margin-bottom: 14px; }
+  .note .meta {
+    display: flex; justify-content: space-between;
+    font-size: 12px; font-weight: 600; color: rgba(12,11,16,0.38);
+  }
+
+  .projects { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; }
+  .project {
+    overflow: hidden;
+    background: rgba(255,255,255,0.9);
+    border: 1px solid rgba(255,255,255,0.75);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+  }
+  .thumb {
+    height: 112px; display: grid; place-items: center;
+    font-family: var(--font-serif); font-weight: 700; font-size: 22px; color: #fff;
+  }
+  .p1 .thumb { background: linear-gradient(135deg, #7c6fff, #4f46e5); }
+  .p2 .thumb { background: linear-gradient(135deg, #2dd4bf, #0f766e); }
+  .p3 .thumb { background: linear-gradient(135deg, #fbbf24, #ea580c); }
+  .project .body { padding: 16px; }
+  .project h3 { font-size: 16px; font-weight: 700; margin-bottom: 8px; letter-spacing: -0.02em; }
+  .project p { color: var(--muted); font-size: 13px; font-weight: 500; min-height: 54px; margin-bottom: 12px; }
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+
+  .band {
+    margin: 12px auto 28px;
+    width: min(100% - 48px, var(--max));
+    border-radius: var(--radius-lg);
+    background:
+      radial-gradient(500px 200px at 10% 0%, rgba(124,108,255,0.25), transparent 55%),
+      #14131a;
+    color: #f5f5f4;
+    padding: 32px;
+    display: grid;
+    grid-template-columns: 1.3fr 0.7fr;
+    gap: 20px;
+    align-items: center;
+    box-shadow: var(--shadow);
+  }
+  .band h2 {
+    font-family: var(--font-serif);
+    font-size: 28px; font-weight: 600; margin-bottom: 10px;
+  }
+  .band p { color: rgba(255,255,255,0.62); font-weight: 500; margin-bottom: 18px; max-width: 480px; }
+  .band .btns { display: flex; gap: 10px; flex-wrap: wrap; }
+  .band .btn-dark { background: #fff; color: #14131a; }
+  .band .btn-light { background: transparent; color: #fff; border-color: rgba(255,255,255,0.18); }
+  .band-side { display: grid; gap: 10px; }
+  .band-side div {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 14px; padding: 14px 16px;
+  }
+  .band-side strong { display: block; font-size: 13px; margin-bottom: 4px; }
+  .band-side span { font-size: 12.5px; color: rgba(255,255,255,0.52); font-weight: 500; }
+
+  @media (max-width: 860px) {
+    .now, .notes, .projects, .band { grid-template-columns: 1fr; }
+    .note.big { grid-row: auto; }
+    .now-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+  <div class="page">
+    <div class="proto-bar">
+      <div>01 · HOME · DIRECTION E</div>
+      <span>多层氛围背景 · 笔记优先个人站</span>
+    </div>
+
+    <header class="site-header is-solid">
+      <div class="header-inner">
+        <a class="logo" href="01-home.html"><span class="logo-mark"></span>赵海蓺</a>
+        <nav class="nav">
+          <a class="is-active" href="01-home.html">首页</a>
+          <a href="02-notes.html">笔记</a>
+          <a href="04-projects.html">项目</a>
+          <a href="06-about.html">关于</a>
+          <a class="btn btn-dark btn-sm" href="#" style="margin-left:8px;">订阅</a>
+        </nav>
+      </div>
+    </header>
+
+    <section class="hero container">
+      <div class="kicker"><i></i> 个人网站 · 公开思考与构建记录</div>
+      <h1>写一点笔记，<span class="soft">做一些能跑起来的东西</span></h1>
+      <p class="lead">这里是我的个人主页：分享 Agent / RAG / 全栈实践，也存放仍在生长的笔记与想法。求职只是用途之一。</p>
+      <div class="cta">
+        <a class="btn btn-dark" href="02-notes.html">阅读笔记</a>
+        <a class="btn btn-light" href="04-projects.html">查看项目</a>
+      </div>
+      <div class="hero-tags">
+        <span>Digital Garden</span><span>AI Systems</span><span>Open Source</span><span>Learning in public</span>
+      </div>
+    </section>
+
+    <div class="now">
+      <h2>Now</h2>
+      <div class="now-grid">
+        <div class="now-item"><b>Build</b> 完善 Code Review Agent 的规范检索</div>
+        <div class="now-item"><b>Write</b> 笔记：如何评价 Agent 工具调用</div>
+        <div class="now-item"><b>Learn</b> 多 Agent 协作中的状态管理</div>
+        <div class="now-item"><b>Life</b> 把私有知识库逐步公开一部分</div>
+      </div>
+    </div>
+
+    <section class="section">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <h2>最新笔记</h2>
+            <p>随写随改。完整长文与碎片札记都会出现在这里。</p>
+          </div>
+          <a class="more" href="02-notes.html">全部笔记 →</a>
+        </div>
+        <div class="notes">
+          <article class="note big">
+            <div class="cat">Essay · Agent</div>
+            <h3>把 Code Review 做成 Agent，而不是把 Diff 丢给大模型</h3>
+            <p>真正难的不是调用 API，而是上下文裁剪、规范检索、失败回退，以及把结果写回协作流程。记录从脚本到系统的取舍。</p>
+            <div class="meta"><span>2026-07-12</span><span>约 12 分钟</span></div>
+          </article>
+          <article class="note">
+            <div class="cat">Note · RAG</div>
+            <h3>NL2SQL 失败时，检索应发生在哪一层？</h3>
+            <p>意图、Schema、样例与自纠错：分层兜底比反复重试提示词更稳。</p>
+            <div class="meta"><span>2026-07-03</span><span>8 分钟</span></div>
+          </article>
+          <article class="note">
+            <div class="cat">Journal</div>
+            <h3>本周札记：可观测性与 Agent 调试</h3>
+            <p>日志字段怎样设计，才同时服务排错与对外讲述。</p>
+            <div class="meta"><span>2026-06-28</span><span>5 分钟</span></div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" style="padding-top:8px;">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <h2>项目与实验</h2>
+            <p>开源与可演示系统，是笔记背后的实践证据。</p>
+          </div>
+          <a class="more" href="04-projects.html">全部项目 →</a>
+        </div>
+        <div class="projects">
+          <article class="project p1">
+            <div class="thumb">评审</div>
+            <div class="body">
+              <h3>Code Review Agent</h3>
+              <p>PR Diff 多维审查 + RAG 规范增强 + GitHub 回写。</p>
+              <div class="tags"><span class="tag">Python</span><span class="tag">Agent</span><span class="tag">RAG</span></div>
+            </div>
+          </article>
+          <article class="project p2">
+            <div class="thumb">问数</div>
+            <div class="body">
+              <h3>智能问数 Wenshu</h3>
+              <p>自然语言查数、SQL 生成与图表可视化。</p>
+              <div class="tags"><span class="tag">Vue</span><span class="tag">NL2SQL</span><span class="tag">LangChain</span></div>
+            </div>
+          </article>
+          <article class="project p3">
+            <div class="thumb">平台</div>
+            <div class="body">
+              <h3>XHAgentOS</h3>
+              <p>知识库 / 技能 / 工作流的 Agent 平台实践。</p>
+              <div class="tags"><span class="tag">React</span><span class="tag">Workflow</span><span class="tag">Full-stack</span></div>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <div class="band">
+      <div>
+        <h2>这个站点为谁而建？</h2>
+        <p>首先是给自己：记录构建与思考。其次是给同行：交流笔记与项目。如果它也帮你了解我是否匹配某个岗位，那是额外的好事。</p>
+        <div class="btns">
+          <a class="btn btn-dark" href="06-about.html">关于我</a>
+          <a class="btn btn-light" href="#">RSS</a>
+        </div>
+      </div>
+      <div class="band-side">
+        <div><strong>笔记</strong><span>公开写作 · 可持续更新</span></div>
+        <div><strong>项目</strong><span>可运行的系统与实验</span></div>
+        <div><strong>关于</strong><span>经历、兴趣与联系方式</span></div>
+      </div>
+    </div>
+
+    <footer class="site-footer">
+      <div class="footer-inner">
+        <div>
+          <div class="logo"><span class="logo-mark"></span>赵海蓺</div>
+          <p>个人网站设计原型 · Direction E · 多层氛围背景</p>
+        </div>
+        <div class="footer-cols">
+          <div class="footer-col">
+            <h4>导航</h4>
+            <a href="02-notes.html">笔记</a>
+            <a href="04-projects.html">项目</a>
+            <a href="06-about.html">关于</a>
+          </div>
+          <div class="footer-col">
+            <h4>连接</h4>
+            <a href="#">GitHub</a>
+            <a href="#">Email</a>
+            <a href="#">RSS</a>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© 2026 Zhao Haiyi · Design Prototype</span>
+        <span>Personal Soft · v2</span>
+      </div>
+    </footer>
+  </div>
+</body>
+</html>

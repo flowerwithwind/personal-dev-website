@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>06 · 关于 — 设计原型</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&family=Noto+Serif+SC:wght@500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="shared.css" />
+<style>
+  .layout {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 28px;
+    padding: 40px 0 56px;
+    align-items: start;
+  }
+  .profile {
+    position: sticky;
+    top: calc(var(--header-h) + 16px);
+    background: rgba(255,255,255,0.9);
+    border: 1px solid rgba(255,255,255,0.8);
+    border-radius: 24px;
+    padding: 22px;
+    box-shadow: var(--shadow);
+    backdrop-filter: blur(10px);
+  }
+  .avatar {
+    width: 100%;
+    aspect-ratio: 1;
+    border-radius: 18px;
+    margin-bottom: 16px;
+    display: grid; place-items: center;
+    font-family: var(--font-serif);
+    font-size: 42px; font-weight: 700; color: #fff;
+    background:
+      radial-gradient(circle at 30% 25%, rgba(255,255,255,0.28), transparent 40%),
+      linear-gradient(145deg, #8b7cff, #5b4dff 50%, #14b8a6);
+  }
+  .profile h1 {
+    font-family: var(--font-serif);
+    font-size: 26px; font-weight: 600; margin-bottom: 4px;
+  }
+  .profile .role { color: var(--muted); font-size: 14px; font-weight: 500; margin-bottom: 16px; }
+  .links { display: grid; gap: 8px; }
+  .links a {
+    display: flex; justify-content: space-between;
+    padding: 10px 12px; border-radius: 12px;
+    border: 1px solid var(--line); background: rgba(243,241,234,0.6);
+    font-size: 13px; font-weight: 600; color: var(--ink-soft);
+  }
+  .block { margin-bottom: 32px; }
+  .block h2 {
+    font-family: var(--font-serif);
+    font-size: 26px; font-weight: 600; margin-bottom: 12px;
+  }
+  .block p { color: var(--ink-soft); font-weight: 500; margin-bottom: 12px; max-width: 640px; }
+  .timeline {
+    border-left: 2px solid var(--line);
+    margin-left: 8px; padding-left: 22px;
+  }
+  .t-item { position: relative; padding-bottom: 22px; }
+  .t-item::before {
+    content: "";
+    position: absolute; left: -29px; top: 6px;
+    width: 12px; height: 12px; border-radius: 50%;
+    background: #fff; border: 2px solid var(--accent);
+    box-shadow: 0 0 0 4px var(--accent-soft);
+  }
+  .t-item .period { font-size: 12px; font-weight: 700; color: var(--accent); margin-bottom: 4px; }
+  .t-item h3 { font-size: 17px; font-weight: 700; margin-bottom: 4px; }
+  .t-item .org { color: var(--muted); font-size: 13.5px; font-weight: 500; margin-bottom: 8px; }
+  .t-item ul { margin-left: 16px; color: var(--ink-soft); font-size: 14px; font-weight: 500; }
+  .skills { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .skill {
+    background: rgba(255,255,255,0.88);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 16px;
+  }
+  .skill h3 { font-size: 13px; color: var(--accent); font-weight: 700; margin-bottom: 10px; }
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+  @media (max-width: 860px) {
+    .layout, .skills { grid-template-columns: 1fr; }
+    .profile { position: static; }
+  }
+</style>
+</head>
+<body>
+  <div class="page">
+    <div class="proto-bar"><div>06 · ABOUT</div><span>人设 · 经历 · 联系 · 非投递站口吻</span></div>
+    <header class="site-header is-solid">
+      <div class="header-inner">
+        <a class="logo" href="01-home.html"><span class="logo-mark"></span>赵海蓺</a>
+        <nav class="nav">
+          <a href="01-home.html">首页</a>
+          <a href="02-notes.html">笔记</a>
+          <a href="04-projects.html">项目</a>
+          <a class="is-active" href="06-about.html">关于</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="container">
+      <div class="layout">
+        <aside class="profile">
+          <div class="avatar">ZH</div>
+          <h1>赵海蓺</h1>
+          <p class="role">写笔记的构建者 · AI Systems</p>
+          <div class="links">
+            <a href="#"><span>GitHub</span><span>↗</span></a>
+            <a href="mailto:hello@example.com"><span>Email</span><span>↗</span></a>
+            <a href="#"><span>RSS</span><span>↗</span></a>
+          </div>
+        </aside>
+
+        <div>
+          <div class="block">
+            <h2>你好</h2>
+            <p>我关注大模型真正进入业务时会发生什么：上下文不够、工具不可靠、结果难验收、系统难部署。因此更愿意做完整链路——从检索与 Agent 编排，到 API、界面、日志与容器化。</p>
+            <p>这个网站用来公开一部分思考与项目。它首先服务我自己的记录，其次欢迎同行交流；如果也对招聘有帮助，那是它的附加价值。</p>
+          </div>
+
+          <div class="block">
+            <h2>轨迹</h2>
+            <div class="timeline">
+              <div class="t-item">
+                <div class="period">2026</div>
+                <h3>Code Review Agent / 智能问数</h3>
+                <div class="org">个人项目 · 写作同步公开</div>
+                <ul>
+                  <li>把评审与 NL2SQL 做成可部署系统，并写成系列笔记。</li>
+                </ul>
+              </div>
+              <div class="t-item">
+                <div class="period">2025 — 2026</div>
+                <h3>XHAgentOS 团队协作</h3>
+                <div class="org">Agent 平台实践</div>
+                <ul>
+                  <li>参与会话、知识库、技能与工作流等模块建设。</li>
+                </ul>
+              </div>
+              <div class="t-item">
+                <div class="period">Education</div>
+                <h3>计算机相关专业（占位）</h3>
+                <div class="org">请替换为真实院校与方向</div>
+                <ul>
+                  <li>可补充课程、实验室或荣誉信息。</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="block">
+            <h2>技能</h2>
+            <div class="skills">
+              <div class="skill">
+                <h3>Languages</h3>
+                <div class="tags"><span class="tag">Python</span><span class="tag">TypeScript</span><span class="tag">SQL</span></div>
+              </div>
+              <div class="skill">
+                <h3>AI / Backend</h3>
+                <div class="tags"><span class="tag">Agent</span><span class="tag">RAG</span><span class="tag">FastAPI</span><span class="tag">LangChain</span></div>
+              </div>
+              <div class="skill">
+                <h3>Frontend</h3>
+                <div class="tags"><span class="tag">Vue 3</span><span class="tag">React</span><span class="tag">Vite</span></div>
+              </div>
+              <div class="skill">
+                <h3>Engineering</h3>
+                <div class="tags"><span class="tag">Docker</span><span class="tag">GitHub</span><span class="tag">Pytest</span><span class="tag">日志/限流</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="block">
+            <a class="btn btn-dark" href="mailto:hello@example.com">邮件联系</a>
+            <a class="btn btn-light" href="02-notes.html" style="margin-left:10px;">阅读笔记</a>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</body>
+</html>

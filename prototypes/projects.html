@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>项目 · 赵海蓺</title>
+  <meta name="description" content="精选开发项目：Code Review Agent、智能问数、XHAgentOS 等。" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="logo" href="index.html">
+        <span class="logo-mark">ZH</span>
+        <span>Zhao Haiyi</span>
+      </a>
+      <nav class="nav" aria-label="主导航">
+        <a href="index.html">首页</a>
+        <a class="is-active" href="projects.html">项目</a>
+        <a href="about.html">关于</a>
+        <a href="contact.html">联系</a>
+      </nav>
+      <div class="header-actions">
+        <button class="icon-btn" type="button" data-theme-toggle aria-label="切换主题"></button>
+        <a class="btn btn-ghost" href="index.html#resume">简历</a>
+        <button class="icon-btn menu-toggle" type="button" aria-label="打开菜单" aria-expanded="false">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <div class="mobile-nav">
+    <a href="index.html">首页</a>
+    <a class="is-active" href="projects.html">项目</a>
+    <a href="about.html">关于</a>
+    <a href="contact.html">联系</a>
+  </div>
+
+  <main>
+    <section class="page-hero">
+      <div class="container">
+        <div class="breadcrumb">
+          <a href="index.html">Home</a>
+          <span>/</span>
+          <span>Projects</span>
+        </div>
+        <h1>项目作品集</h1>
+        <p>从 Agent 评审到 NL2SQL 问数与平台化建设，聚焦「能上线、可解释、可演示」的工程结果。</p>
+      </div>
+    </section>
+
+    <section class="section" style="padding-top: 12px;">
+      <div class="container">
+        <div class="filter-bar" role="toolbar" aria-label="项目筛选">
+          <button class="filter-chip is-active" type="button" data-filter="all">全部</button>
+          <button class="filter-chip" type="button" data-filter="agent">AI Agent</button>
+          <button class="filter-chip" type="button" data-filter="data">数据智能</button>
+          <button class="filter-chip" type="button" data-filter="fullstack">全栈平台</button>
+        </div>
+
+        <div class="cards-2">
+          <a class="project-card" href="project-detail.html" data-tags="agent fullstack">
+            <div class="project-cover">
+              <span class="cover-badge">Featured</span>
+              <div class="cover-icon">CR</div>
+            </div>
+            <div class="project-body">
+              <h3>Code Review Agent</h3>
+              <p>LLM + Agent + RAG 智能代码评审：解析 GitHub PR Diff，覆盖正确性 / 安全 / 性能 / 可维护性，并回写 PR Comment。</p>
+              <div class="tag-row">
+                <span class="tag">Agent</span>
+                <span class="tag">RAG</span>
+                <span class="tag">FastAPI</span>
+                <span class="tag">Docker</span>
+              </div>
+              <div class="card-footer">
+                <span>2026 · AI Agent</span>
+                <span class="card-link">案例详情 →</span>
+              </div>
+            </div>
+          </a>
+
+          <a class="project-card" href="project-detail.html" data-tags="data agent fullstack">
+            <div class="project-cover">
+              <span class="cover-badge">Data AI</span>
+              <div class="cover-icon">QA</div>
+            </div>
+            <div class="project-body">
+              <h3>智能问数 Wenshu</h3>
+              <p>自然语言驱动的数据问答：意图识别、NL2SQL、RAG 兜底、自纠错执行与 Chart.js 可视化，支持 Pipeline / ReAct 双模式。</p>
+              <div class="tag-row">
+                <span class="tag">NL2SQL</span>
+                <span class="tag">Vue 3</span>
+                <span class="tag">LangChain</span>
+                <span class="tag">BGE</span>
+              </div>
+              <div class="card-footer">
+                <span>2026 · 数据智能</span>
+                <span class="card-link">案例详情 →</span>
+              </div>
+            </div>
+          </a>
+
+          <a class="project-card" href="project-detail.html" data-tags="fullstack agent">
+            <div class="project-cover">
+              <span class="cover-badge">Platform</span>
+              <div class="cover-icon">OS</div>
+            </div>
+            <div class="project-body">
+              <h3>XHAgentOS</h3>
+              <p>团队协作打造的 Agent 操作系统原型：智能对话、知识库、技能中心、工作流编排、舆情与监控等多业务模块。</p>
+              <div class="tag-row">
+                <span class="tag">React</span>
+                <span class="tag">Workflow</span>
+                <span class="tag">Auth</span>
+                <span class="tag">Full-stack</span>
+              </div>
+              <div class="card-footer">
+                <span>2026 · 全栈平台</span>
+                <span class="card-link">案例详情 →</span>
+              </div>
+            </div>
+          </a>
+
+          <article class="project-card" data-tags="fullstack" style="cursor:default;">
+            <div class="project-cover">
+              <span class="cover-badge">Coming soon</span>
+              <div class="cover-icon">+</div>
+            </div>
+            <div class="project-body">
+              <h3>更多作品占位</h3>
+              <p>后续可补充开源贡献、课程作业精品、技术博客系列与实验性 Demo，保持 3–6 个高质量案例即可。</p>
+              <div class="tag-row">
+                <span class="tag tag-muted">Open Source</span>
+                <span class="tag tag-muted">Writing</span>
+              </div>
+              <div class="card-footer">
+                <span>规划中</span>
+                <span class="muted">保持精选，拒绝注水</span>
+              </div>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-inner">
+        <div class="footer-brand">
+          <a class="logo" href="index.html">
+            <span class="logo-mark">ZH</span>
+            <span>Zhao Haiyi</span>
+          </a>
+          <p>用项目证据讲述工程能力与问题求解路径。</p>
+        </div>
+        <div class="footer-cols">
+          <div class="footer-col">
+            <h4>导航</h4>
+            <a href="index.html">首页</a>
+            <a href="projects.html">项目</a>
+            <a href="about.html">关于</a>
+            <a href="contact.html">联系</a>
+          </div>
+          <div class="footer-col">
+            <h4>社交</h4>
+            <a href="#">GitHub</a>
+            <a href="mailto:hello@example.com">Email</a>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© 2026 Zhao Haiyi · Projects Prototype</span>
+        <span class="muted">Filter chips are interactive</span>
+      </div>
+    </div>
+  </footer>
+  <script src="js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>方向 C · Terminal IDE</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "IBM Plex Sans", "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: #0d1117;
+    color: #e6edf3;
+  }
+  .frame {
+    max-width: 1280px; margin: 0 auto; min-height: 100vh;
+    border-left: 1px solid #21262d; border-right: 1px solid #21262d;
+    background: #0d1117;
+  }
+  .badge {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 10px 20px; background: #010409; border-bottom: 1px solid #21262d;
+    color: #3fb950; font-family: "IBM Plex Mono", monospace; font-size: 12px;
+  }
+  .badge span { color: #8b949e; }
+  .ide {
+    display: grid; grid-template-columns: 220px 1fr; min-height: calc(100vh - 40px);
+  }
+  .sidebar {
+    border-right: 1px solid #21262d; background: #010409; padding: 18px 12px;
+  }
+  .side-title {
+    font-family: "IBM Plex Mono", monospace; font-size: 11px; color: #8b949e;
+    text-transform: uppercase; letter-spacing: .08em; margin: 10px 8px 8px;
+  }
+  .file {
+    display: flex; gap: 8px; align-items: center;
+    padding: 8px 10px; border-radius: 6px; color: #c9d1d9; font-size: 13px;
+    font-family: "IBM Plex Mono", monospace;
+  }
+  .file.active { background: #161b22; color: #58a6ff; }
+  .file .dot { width: 8px; height: 8px; border-radius: 2px; }
+  .dot.py { background: #3572A5; }
+  .dot.md { background: #083fa1; }
+  .dot.ts { background: #3178c6; }
+  .dot.json { background: #cbcb41; }
+  .main { display: flex; flex-direction: column; }
+  .tabs {
+    display: flex; gap: 0; border-bottom: 1px solid #21262d; background: #0d1117;
+    overflow: auto;
+  }
+  .tab {
+    padding: 10px 16px; font-size: 12px; color: #8b949e;
+    border-right: 1px solid #21262d; font-family: "IBM Plex Mono", monospace;
+  }
+  .tab.active { color: #e6edf3; background: #161b22; border-top: 2px solid #f78166; }
+  .editor { padding: 28px 32px 40px; }
+  .path {
+    font-family: "IBM Plex Mono", monospace; font-size: 12px; color: #8b949e; margin-bottom: 18px;
+  }
+  h1 {
+    font-size: 36px; line-height: 1.2; letter-spacing: -.02em; margin-bottom: 12px; font-weight: 700;
+  }
+  h1 .g { color: #3fb950; }
+  h1 .b { color: #58a6ff; }
+  h1 .o { color: #f78166; }
+  .lead { color: #8b949e; max-width: 640px; line-height: 1.7; margin-bottom: 22px; font-size: 15px; }
+  .cmd {
+    display: inline-flex; align-items: center; gap: 10px;
+    background: #161b22; border: 1px solid #30363d; border-radius: 8px;
+    padding: 10px 14px; font-family: "IBM Plex Mono", monospace; font-size: 13px;
+    color: #c9d1d9; margin-bottom: 28px;
+  }
+  .cmd .prompt { color: #3fb950; }
+  .cmd .cursor {
+    width: 8px; height: 16px; background: #58a6ff; display: inline-block;
+    animation: blink 1s step-end infinite;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+  .actions { display: flex; gap: 10px; margin-bottom: 32px; }
+  .btn {
+    height: 38px; padding: 0 14px; border-radius: 6px; font-size: 13px; font-weight: 600;
+    display: inline-flex; align-items: center; text-decoration: none; border: 1px solid #30363d;
+    font-family: "IBM Plex Mono", monospace;
+  }
+  .btn-green { background: #238636; border-color: #2ea043; color: #fff; }
+  .btn-gray { background: #21262d; color: #c9d1d9; }
+  .block-title {
+    font-family: "IBM Plex Mono", monospace; font-size: 12px; color: #8b949e;
+    margin-bottom: 12px;
+  }
+  .block-title span { color: #f78166; }
+  .grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; }
+  .card {
+    background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 14px;
+  }
+  .card .name { font-family: "IBM Plex Mono", monospace; font-size: 13px; color: #58a6ff; margin-bottom: 8px; }
+  .card p { color: #8b949e; font-size: 12.5px; line-height: 1.55; min-height: 58px; margin-bottom: 10px; }
+  .chip-row { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip {
+    font-family: "IBM Plex Mono", monospace; font-size: 10px; color: #3fb950;
+    border: 1px solid #238636; border-radius: 999px; padding: 2px 8px; background: rgba(35,134,54,.15);
+  }
+  .status {
+    margin-top: auto; border-top: 1px solid #21262d; background: #161b22;
+    display: flex; justify-content: space-between; padding: 8px 16px;
+    font-family: "IBM Plex Mono", monospace; font-size: 11px; color: #8b949e;
+  }
+  .status b { color: #3fb950; font-weight: 500; }
+  .note {
+    margin: 0 20px 20px; padding: 14px 16px; border-radius: 8px;
+    border: 1px solid #30363d; background: #161b22; color: #8b949e;
+    font-size: 12.5px; line-height: 1.6; font-family: "IBM Plex Mono", monospace;
+  }
+  .note strong { color: #f78166; }
+</style>
+</head>
+<body>
+  <div class="frame">
+    <div class="badge">
+      <div>DIRECTION C · TERMINAL / IDE</div>
+      <span>编辑器美学 · 极客记忆点强</span>
+    </div>
+    <div class="ide">
+      <aside class="sidebar">
+        <div class="side-title">Explorer</div>
+        <div class="file active"><span class="dot md"></span>README.md</div>
+        <div class="file"><span class="dot py"></span>review_agent.py</div>
+        <div class="file"><span class="dot py"></span>nl2sql.py</div>
+        <div class="file"><span class="dot ts"></span>agent-os.tsx</div>
+        <div class="file"><span class="dot json"></span>package.json</div>
+        <div class="side-title">Social</div>
+        <div class="file"><span class="dot md"></span>github</div>
+        <div class="file"><span class="dot md"></span>email</div>
+        <div class="file"><span class="dot md"></span>resume.pdf</div>
+      </aside>
+      <div class="main">
+        <div class="tabs">
+          <div class="tab active">README.md</div>
+          <div class="tab">projects/</div>
+          <div class="tab">contact.ts</div>
+        </div>
+        <div class="editor">
+          <div class="path">portfolio / README.md</div>
+          <h1><span class="g">#</span> 赵海蓺 <span class="b">//</span> <span class="o">AI Agent Engineer</span></h1>
+          <p class="lead">专注可落地的 LLM Agent 与全栈系统。当前作品：Code Review Agent · 智能问数 · XHAgentOS。</p>
+          <div class="cmd">
+            <span class="prompt">$</span>
+            <span>whoami && open projects/</span>
+            <span class="cursor"></span>
+          </div>
+          <div class="actions">
+            <a class="btn btn-green" href="#">./view_projects</a>
+            <a class="btn btn-gray" href="#">cat resume.pdf</a>
+            <a class="btn btn-gray" href="#">mail hello@example.com</a>
+          </div>
+          <div class="block-title"><span>##</span> featured_projects</div>
+          <div class="grid">
+            <article class="card">
+              <div class="name">code-review-agent/</div>
+              <p>PR Diff 多维审查 + RAG 规范增强 + GitHub 评论回写。</p>
+              <div class="chip-row"><span class="chip">python</span><span class="chip">rag</span><span class="chip">fastapi</span></div>
+            </article>
+            <article class="card">
+              <div class="name">wenshu-nl2sql/</div>
+              <p>自然语言问数，SQL 生成与图表可视化双路径。</p>
+              <div class="chip-row"><span class="chip">vue</span><span class="chip">nl2sql</span><span class="chip">langchain</span></div>
+            </article>
+            <article class="card">
+              <div class="name">xh-agent-os/</div>
+              <p>知识库 / 技能 / 工作流的 Agent 平台原型。</p>
+              <div class="chip-row"><span class="chip">react</span><span class="chip">workflow</span><span class="chip">fullstack</span></div>
+            </article>
+          </div>
+        </div>
+        <div class="status">
+          <span><b>●</b> main*</span>
+          <span>UTF-8 · TypeScript React · Ln 42</span>
+          <span>Portfolio v0.1 prototype</span>
+        </div>
+      </div>
+    </div>
+    <div class="note">
+      <strong>// style notes</strong><br/>
+      关键词：终端感、GitHub 深色、强开发者身份 · 对技术面试官记忆点高 · 对非技术 HR 略硬 · 参考 Tamal Sen / IDE UI · 实现成本中等。
+    </div>
+  </div>
+</body>
+</html>

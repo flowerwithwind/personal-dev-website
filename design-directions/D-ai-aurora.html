@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>方向 D · AI Aurora</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "Outfit", "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: #050510;
+    color: #f5f3ff;
+  }
+  .frame {
+    max-width: 1280px; margin: 0 auto; min-height: 100vh; position: relative; overflow: hidden;
+    background:
+      radial-gradient(900px 500px at 15% 10%, rgba(168,85,247,.28), transparent 55%),
+      radial-gradient(800px 480px at 90% 20%, rgba(56,189,248,.22), transparent 50%),
+      radial-gradient(700px 400px at 50% 90%, rgba(244,63,94,.16), transparent 55%),
+      #07071a;
+  }
+  .badge {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 10px 28px; background: rgba(0,0,0,.35); border-bottom: 1px solid rgba(255,255,255,.08);
+    color: #c4b5fd; font-size: 12px; letter-spacing: .06em; font-weight: 600;
+    backdrop-filter: blur(12px);
+  }
+  .badge span { color: rgba(255,255,255,.5); font-weight: 500; }
+  header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 22px 40px;
+  }
+  .logo {
+    display: flex; gap: 10px; align-items: center; font-weight: 700; letter-spacing: -.02em;
+  }
+  .orb {
+    width: 34px; height: 34px; border-radius: 12px;
+    background: conic-gradient(from 180deg, #22d3ee, #a855f7, #f43f5e, #22d3ee);
+    box-shadow: 0 0 24px rgba(168,85,247,.45);
+  }
+  nav { display: flex; gap: 8px; align-items: center; color: rgba(255,255,255,.65); font-size: 14px; font-weight: 500; }
+  nav a { color: inherit; text-decoration: none; padding: 8px 12px; border-radius: 999px; }
+  nav a.active { color: #fff; background: rgba(255,255,255,.08); }
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    height: 46px; padding: 0 20px; border-radius: 999px; font-size: 14px; font-weight: 600;
+    text-decoration: none; border: none;
+  }
+  .btn-glow {
+    color: #fff;
+    background: linear-gradient(135deg, #22d3ee, #8b5cf6 50%, #f43f5e);
+    box-shadow: 0 10px 40px rgba(139,92,246,.35);
+  }
+  .btn-glass {
+    color: #fff; background: rgba(255,255,255,.08);
+    border: 1px solid rgba(255,255,255,.14); backdrop-filter: blur(10px);
+  }
+  .hero {
+    padding: 48px 40px 36px;
+    display: grid; grid-template-columns: 1.1fr .9fr; gap: 36px; align-items: center;
+  }
+  .kicker {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 6px 12px; border-radius: 999px; margin-bottom: 18px;
+    background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1);
+    color: #a5b4fc; font-size: 12px; font-weight: 600; letter-spacing: .04em;
+  }
+  .kicker i {
+    width: 6px; height: 6px; border-radius: 50%; background: #34d399;
+    box-shadow: 0 0 10px #34d399; display: inline-block;
+  }
+  h1 {
+    font-size: 52px; line-height: 1.08; letter-spacing: -.035em; font-weight: 800; margin-bottom: 16px;
+  }
+  h1 .grad {
+    background: linear-gradient(90deg, #67e8f9, #c4b5fd, #fda4af);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .lead {
+    color: rgba(255,255,255,.68); font-size: 17px; line-height: 1.7; max-width: 520px; margin-bottom: 28px;
+  }
+  .cta { display: flex; gap: 12px; flex-wrap: wrap; }
+  .visual {
+    position: relative; min-height: 380px; border-radius: 28px;
+    border: 1px solid rgba(255,255,255,.1);
+    background: rgba(255,255,255,.03); backdrop-filter: blur(18px);
+    overflow: hidden; box-shadow: 0 30px 80px rgba(0,0,0,.35);
+  }
+  .visual::before {
+    content: ""; position: absolute; inset: -40%;
+    background:
+      radial-gradient(circle at 30% 40%, rgba(34,211,238,.35), transparent 35%),
+      radial-gradient(circle at 70% 60%, rgba(168,85,247,.4), transparent 40%),
+      radial-gradient(circle at 50% 20%, rgba(244,63,94,.25), transparent 35%);
+    filter: blur(8px);
+  }
+  .glass-card {
+    position: absolute; inset: 28px;
+    border-radius: 22px; border: 1px solid rgba(255,255,255,.12);
+    background: rgba(7,7,26,.55); padding: 22px; display: flex; flex-direction: column; gap: 14px;
+  }
+  .row { display: flex; justify-content: space-between; align-items: center; }
+  .pill {
+    font-size: 11px; font-weight: 600; letter-spacing: .04em;
+    padding: 5px 10px; border-radius: 999px; background: rgba(52,211,153,.15); color: #6ee7b7;
+    border: 1px solid rgba(52,211,153,.3);
+  }
+  .metric {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+  }
+  .m {
+    border-radius: 16px; padding: 14px;
+    background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.08);
+  }
+  .m b { display: block; font-size: 22px; margin-bottom: 4px; }
+  .m span { color: rgba(255,255,255,.5); font-size: 12px; }
+  .flow {
+    flex: 1; border-radius: 16px; padding: 14px;
+    background: linear-gradient(180deg, rgba(139,92,246,.18), rgba(34,211,238,.08));
+    border: 1px solid rgba(255,255,255,.08);
+    font-size: 13px; color: rgba(255,255,255,.75); line-height: 1.7;
+  }
+  .flow strong { color: #e9d5ff; }
+  .section { padding: 12px 40px 48px; }
+  .section h2 { font-size: 28px; margin-bottom: 8px; letter-spacing: -.02em; }
+  .section .sub { color: rgba(255,255,255,.55); margin-bottom: 22px; }
+  .cards { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; }
+  .card {
+    border-radius: 20px; padding: 18px;
+    background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08);
+    backdrop-filter: blur(10px);
+  }
+  .card .top {
+    width: 42px; height: 42px; border-radius: 14px; margin-bottom: 14px;
+    display: grid; place-items: center; font-weight: 800; font-size: 13px; color: #fff;
+  }
+  .card:nth-child(1) .top { background: linear-gradient(135deg,#22d3ee,#6366f1); }
+  .card:nth-child(2) .top { background: linear-gradient(135deg,#a855f7,#f43f5e); }
+  .card:nth-child(3) .top { background: linear-gradient(135deg,#f59e0b,#ec4899); }
+  .card h3 { font-size: 17px; margin-bottom: 8px; }
+  .card p { color: rgba(255,255,255,.58); font-size: 13.5px; line-height: 1.55; min-height: 62px; }
+  .note {
+    margin: 0 40px 40px; padding: 16px 18px; border-radius: 16px;
+    background: rgba(255,255,255,.04); border: 1px solid rgba(196,181,253,.25);
+    color: rgba(255,255,255,.65); font-size: 13px; line-height: 1.6;
+  }
+  .note strong { color: #c4b5fd; }
+</style>
+</head>
+<body>
+  <div class="frame">
+    <div class="badge">
+      <div>DIRECTION D · AI AURORA</div>
+      <span>炫彩科技感 · 强 AI 产品气质</span>
+    </div>
+    <header>
+      <div class="logo"><div class="orb"></div>Zhao Haiyi</div>
+      <nav>
+        <a class="active" href="#">首页</a>
+        <a href="#">项目</a>
+        <a href="#">关于</a>
+        <a href="#">联系</a>
+        <a class="btn btn-glass" href="#" style="height:38px; padding:0 14px;">简历</a>
+      </nav>
+    </header>
+
+    <section class="hero">
+      <div>
+        <div class="kicker"><i></i> BUILDING SHIPABLE AGENTS</div>
+        <h1>用系统思维<br/><span class="grad">点亮智能体能力</span></h1>
+        <p class="lead">我是赵海蓺，专注 AI Agent / RAG / 全栈工程。让模型不只停留在 Demo，而能进入真实工作流。</p>
+        <div class="cta">
+          <a class="btn btn-glow" href="#">探索项目宇宙</a>
+          <a class="btn btn-glass" href="#">预约交流</a>
+        </div>
+      </div>
+      <div class="visual">
+        <div class="glass-card">
+          <div class="row">
+            <strong style="font-size:15px;">Agent Runtime</strong>
+            <span class="pill">ONLINE</span>
+          </div>
+          <div class="metric">
+            <div class="m"><b>3</b><span>Core Systems</span></div>
+            <div class="m"><b>RAG</b><span>Knowledge Boost</span></div>
+            <div class="m"><b>API</b><span>Webhook Ready</span></div>
+            <div class="m"><b>UI</b><span>Full-stack</span></div>
+          </div>
+          <div class="flow">
+            <strong>Pipeline</strong><br/>
+            Intent → Tools → RAG → Act → Observe → Ship
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>精选能力节点</h2>
+      <p class="sub">三个可讲述、可演示的核心项目</p>
+      <div class="cards">
+        <article class="card">
+          <div class="top">CR</div>
+          <h3>Code Review Agent</h3>
+          <p>多维度 PR 审查与知识增强，连接 GitHub 协作闭环。</p>
+        </article>
+        <article class="card">
+          <div class="top">QA</div>
+          <h3>智能问数</h3>
+          <p>NL2SQL + 可视化，让业务问题一句话变成图表。</p>
+        </article>
+        <article class="card">
+          <div class="top">OS</div>
+          <h3>XHAgentOS</h3>
+          <p>会话、知识库、技能与工作流组成的 Agent 平台。</p>
+        </article>
+      </div>
+    </section>
+
+    <div class="note">
+      <strong>风格关键词：</strong>未来感、渐变光晕、AI 产品站气质 · 视觉冲击强、适合 AI 方向求职包装 · 需控制动效与性能 · 对传统企业 HR 可能偏炫 · 实现成本中高。
+    </div>
+  </div>
+</body>
+</html>

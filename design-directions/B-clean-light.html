@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>方向 B · Clean Light Studio</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet" />
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "DM Sans", "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: #eef2f7;
+    color: #0f172a;
+  }
+  .frame {
+    max-width: 1280px; margin: 0 auto; min-height: 100vh;
+    background: #f8fafc;
+    box-shadow: 0 0 0 1px #e2e8f0, 0 30px 80px rgba(15,23,42,.08);
+  }
+  .badge {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 10px 28px; background: #0f172a; color: #7dd3c7;
+    font-size: 12px; letter-spacing: .04em; font-weight: 600;
+  }
+  .badge span { color: #94a3b8; font-weight: 500; }
+  header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 20px 48px; background: #fff; border-bottom: 1px solid #e2e8f0;
+  }
+  .logo { font-weight: 700; font-size: 18px; letter-spacing: -.02em; }
+  .logo span { color: #0d9488; }
+  nav { display: flex; gap: 22px; align-items: center; font-size: 14px; color: #64748b; font-weight: 500; }
+  nav a { color: inherit; text-decoration: none; }
+  nav a.active { color: #0f172a; }
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    height: 44px; padding: 0 18px; border-radius: 999px; font-size: 14px; font-weight: 600;
+    text-decoration: none; border: none;
+  }
+  .btn-primary { background: #0f172a; color: #fff; }
+  .btn-soft { background: #e2e8f0; color: #0f172a; }
+  .hero {
+    text-align: center; padding: 72px 48px 56px;
+    background:
+      radial-gradient(600px 240px at 50% 0%, rgba(13,148,136,.12), transparent 70%),
+      linear-gradient(180deg, #fff 0%, #f8fafc 100%);
+  }
+  .avatar {
+    width: 96px; height: 96px; border-radius: 50%; margin: 0 auto 20px;
+    background: linear-gradient(145deg, #99f6e4, #5eead4 40%, #0d9488);
+    display: grid; place-items: center; color: #042f2e; font-weight: 800; font-size: 28px;
+    box-shadow: 0 12px 30px rgba(13,148,136,.25);
+  }
+  .hero h1 {
+    font-size: 52px; line-height: 1.1; letter-spacing: -.03em; margin-bottom: 14px; font-weight: 700;
+  }
+  .hero h1 em { font-style: normal; color: #0d9488; }
+  .lead {
+    max-width: 620px; margin: 0 auto 28px; color: #475569; font-size: 18px; line-height: 1.65;
+  }
+  .cta { display: flex; gap: 12px; justify-content: center; margin-bottom: 18px; }
+  .trust { color: #94a3b8; font-size: 13px; }
+  .wave {
+    height: 56px; background: #0f172a;
+    clip-path: ellipse(70% 100% at 50% 100%);
+  }
+  .skills {
+    margin-top: -28px; display: grid; grid-template-columns: repeat(3,1fr); gap: 18px;
+    padding: 0 48px 40px;
+  }
+  .skill {
+    background: #fff; border-radius: 18px; padding: 28px 22px; text-align: center;
+    box-shadow: 0 10px 30px rgba(15,23,42,.06); border: 1px solid #e2e8f0;
+  }
+  .skill .ico {
+    width: 48px; height: 48px; border-radius: 14px; margin: 0 auto 14px;
+    display: grid; place-items: center; font-weight: 700; font-size: 14px;
+  }
+  .skill:nth-child(1) .ico { background: #ccfbf1; color: #0f766e; }
+  .skill:nth-child(2) .ico { background: #e0e7ff; color: #4338ca; }
+  .skill:nth-child(3) .ico { background: #fef3c7; color: #b45309; }
+  .skill h3 { font-size: 18px; margin-bottom: 8px; }
+  .skill p { color: #64748b; font-size: 14px; line-height: 1.55; }
+  .section { padding: 20px 48px 56px; }
+  .section h2 { text-align: center; font-size: 30px; margin-bottom: 8px; letter-spacing: -.02em; }
+  .section .sub { text-align: center; color: #64748b; margin-bottom: 28px; }
+  .projects { display: grid; grid-template-columns: repeat(3,1fr); gap: 18px; }
+  .project {
+    background: #fff; border-radius: 18px; overflow: hidden; border: 1px solid #e2e8f0;
+    box-shadow: 0 8px 24px rgba(15,23,42,.04);
+  }
+  .thumb {
+    height: 140px;
+    background: linear-gradient(135deg, #ccfbf1, #e0e7ff);
+    display: grid; place-items: center; font-weight: 800; color: #0f172a; font-size: 22px;
+  }
+  .project:nth-child(2) .thumb { background: linear-gradient(135deg, #ddd6fe, #c7d2fe); }
+  .project:nth-child(3) .thumb { background: linear-gradient(135deg, #fde68a, #fed7aa); }
+  .project .body { padding: 18px; }
+  .project h3 { font-size: 17px; margin-bottom: 8px; }
+  .project p { color: #64748b; font-size: 13.5px; line-height: 1.55; margin-bottom: 12px; min-height: 62px; }
+  .link { color: #0d9488; font-size: 13px; font-weight: 600; }
+  .note {
+    margin: 0 48px 40px; padding: 16px 18px; border-radius: 14px;
+    background: #ecfeff; border: 1px solid #99f6e4; color: #334155; font-size: 13px; line-height: 1.6;
+  }
+  .note strong { color: #0f766e; }
+</style>
+</head>
+<body>
+  <div class="frame">
+    <div class="badge">
+      <div>DIRECTION B · CLEAN LIGHT STUDIO</div>
+      <span>浅色转化落地页 · 亲和 / 招聘友好</span>
+    </div>
+    <header>
+      <div class="logo">Zhao <span>Haiyi</span></div>
+      <nav>
+        <a class="active" href="#">首页</a>
+        <a href="#">项目</a>
+        <a href="#">关于</a>
+        <a href="#">联系</a>
+        <a class="btn btn-primary" href="#" style="height:38px;">下载简历</a>
+      </nav>
+    </header>
+
+    <section class="hero">
+      <div class="avatar">ZH</div>
+      <h1>设计师感的工程师主页<br/>我是 <em>赵海蓺</em></h1>
+      <p class="lead">我设计并交付可落地的 AI Agent 与全栈产品。擅长把模型能力变成清晰的接口、界面与部署流程。</p>
+      <div class="cta">
+        <a class="btn btn-primary" href="#">查看作品</a>
+        <a class="btn btn-soft" href="#">开始对话</a>
+      </div>
+      <p class="trust">面向实习 / 全职机会 · 欢迎技术交流</p>
+    </section>
+    <div class="wave"></div>
+
+    <div class="skills">
+      <div class="skill">
+        <div class="ico">AI</div>
+        <h3>Agent 系统</h3>
+        <p>工具调用、RAG 增强、审查与问数闭环，强调可演示与可部署。</p>
+      </div>
+      <div class="skill">
+        <div class="ico">FS</div>
+        <h3>全栈交付</h3>
+        <p>FastAPI + Vue/React，从 API 到可视化界面一次做完整。</p>
+      </div>
+      <div class="skill">
+        <div class="ico">EN</div>
+        <h3>工程化</h3>
+        <p>Docker、测试、日志与文档，让项目能被他人复现与评审。</p>
+      </div>
+    </div>
+
+    <section class="section">
+      <h2>近期作品</h2>
+      <p class="sub">精选 3 个可讲述案例</p>
+      <div class="projects">
+        <article class="project">
+          <div class="thumb">CR</div>
+          <div class="body">
+            <h3>Code Review Agent</h3>
+            <p>智能代码评审 Agent，覆盖多维度检查并回写 PR 评论。</p>
+            <div class="link">查看案例 →</div>
+          </div>
+        </article>
+        <article class="project">
+          <div class="thumb">QA</div>
+          <div class="body">
+            <h3>智能问数 Wenshu</h3>
+            <p>自然语言查数 + SQL 生成 + 图表可视化。</p>
+            <div class="link">查看案例 →</div>
+          </div>
+        </article>
+        <article class="project">
+          <div class="thumb">OS</div>
+          <div class="body">
+            <h3>XHAgentOS</h3>
+            <p>知识库 / 技能 / 工作流一体的 Agent 平台。</p>
+            <div class="link">查看案例 →</div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <div class="note">
+      <strong>风格关键词：</strong>明亮、友好、转化导向 · HR 阅读负担低 · 略偏产品/设计气质 · 参考 Matt Farley 落地页结构 · 实现成本低。
+    </div>
+  </div>
+</body>
+</html>

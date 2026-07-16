@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>个人网站 · 设计方向选型（更新）</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700&family=Noto+Serif+SC:wght@600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #f4f4ef;
+    --ink: #09090b;
+    --muted: rgba(0,0,0,.52);
+    --line: rgba(0,0,0,.08);
+    --accent: #5b4dff;
+    --card: #fff;
+    --font: "Inter", "Noto Sans SC", "PingFang SC", sans-serif;
+    --serif: "Noto Serif SC", serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: var(--font);
+    background: var(--bg);
+    color: var(--ink);
+    padding: 40px 20px 72px;
+    line-height: 1.7;
+  }
+  .wrap { max-width: 1120px; margin: 0 auto; }
+  .eyebrow {
+    display: inline-block; margin-bottom: 12px;
+    font-size: 12.5px; font-weight: 700; color: var(--accent);
+    background: rgba(91,77,255,.08); border-radius: 999px; padding: 6px 12px;
+  }
+  h1 {
+    font-family: var(--serif);
+    font-size: clamp(28px, 4vw, 40px);
+    font-weight: 600; letter-spacing: -0.02em; margin-bottom: 12px;
+  }
+  .sub { color: var(--muted); max-width: 720px; font-weight: 500; margin-bottom: 24px; }
+  .insight {
+    background: #fff; border: 1px solid var(--line); border-radius: 18px;
+    padding: 18px 20px; margin-bottom: 28px; box-shadow: 0 10px 30px rgba(15,15,20,.04);
+  }
+  .insight h2 { font-size: 15px; margin-bottom: 8px; }
+  .insight ul { margin-left: 18px; color: var(--muted); font-size: 14px; font-weight: 500; }
+  .insight li + li { margin-top: 4px; }
+  .insight code { font-size: 12.5px; background: rgba(0,0,0,.05); padding: 1px 6px; border-radius: 6px; }
+
+  .featured {
+    border: 2px solid rgba(91,77,255,.35);
+    background: linear-gradient(180deg, #fff, #f8f7ff);
+    border-radius: 22px; padding: 22px; margin-bottom: 28px;
+    display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 18px; align-items: center;
+  }
+  .tag-rec {
+    display: inline-block; font-size: 11.5px; font-weight: 700; color: #fff;
+    background: var(--accent); border-radius: 999px; padding: 4px 10px; margin-bottom: 10px;
+  }
+  .featured h2 {
+    font-family: var(--serif); font-size: 28px; font-weight: 600; margin-bottom: 10px;
+  }
+  .featured p { color: var(--muted); font-weight: 500; margin-bottom: 16px; }
+  .actions { display: flex; flex-wrap: wrap; gap: 10px; }
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    height: 42px; padding: 0 16px; border-radius: 999px; font-size: 14px; font-weight: 700;
+    text-decoration: none; border: 1px solid transparent;
+  }
+  .btn-dark { background: #111; color: #fff; }
+  .btn-light { background: #fff; color: #111; border-color: var(--line); }
+
+  .preview-box {
+    border-radius: 16px; overflow: hidden; border: 1px solid var(--line);
+    background: #fff; min-height: 220px; position: relative;
+  }
+  .preview-box iframe {
+    width: 1280px; height: 900px; border: 0;
+    transform: scale(0.28); transform-origin: top left;
+    pointer-events: none;
+  }
+
+  h3.section {
+    font-family: var(--serif); font-size: 22px; font-weight: 600;
+    margin: 8px 0 14px;
+  }
+  .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+  .card {
+    background: var(--card); border: 1px solid var(--line); border-radius: 18px;
+    padding: 18px; display: flex; flex-direction: column; gap: 8px;
+  }
+  .card .id { font-size: 12px; font-weight: 700; color: var(--accent); letter-spacing: .04em; }
+  .card h4 { font-size: 18px; letter-spacing: -0.02em; }
+  .card p { color: var(--muted); font-size: 13.5px; font-weight: 500; flex: 1; }
+  .card .meta { font-size: 12px; color: rgba(0,0,0,.4); font-weight: 600; }
+  .card a { color: var(--accent); font-weight: 700; font-size: 13.5px; }
+
+  .compare {
+    margin-top: 28px; overflow: auto; border: 1px solid var(--line);
+    border-radius: 16px; background: #fff;
+  }
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  th, td { padding: 12px 14px; text-align: left; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { background: rgba(0,0,0,.03); font-weight: 700; }
+  td { color: var(--muted); font-weight: 500; }
+  td:first-child { color: var(--ink); font-weight: 700; white-space: nowrap; }
+
+  .foot {
+    margin-top: 24px; padding: 16px 18px; border-radius: 14px;
+    border: 1px dashed rgba(91,77,255,.35); background: rgba(91,77,255,.04);
+    color: var(--muted); font-size: 13.5px; font-weight: 500;
+  }
+  .foot strong { color: var(--accent); }
+
+  @media (max-width: 860px) {
+    .featured, .grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="eyebrow">UPDATED · 根据你的反馈重排方向</div>
+    <h1>更偏「个人网站」，而不只是求职作品集</h1>
+    <p class="sub">
+      已根据你的意见与 Coze 官网视觉采样，新增推荐方向 <strong>E · Personal Soft</strong>：
+      暖色纸感背景、宋体大标题、全圆角按钮；信息架构加入「笔记 / 数字花园」，项目与写作并列。
+    </p>
+
+    <div class="insight">
+      <h2>从 Coze（coze.cn）采样到的可复用点</h2>
+      <ul>
+        <li>背景：暖灰纸色 <code>#F4F4EF</code>，而非纯白或冷黑极客风</li>
+        <li>标题：思源宋体系大标题（Coze 使用 SourceHanSerifCN；原型用 Noto Serif SC）</li>
+        <li>正文：干净无衬线 + 中等字重，行高宽松</li>
+        <li>控件：胶囊圆角按钮（实心黑 + 描边浅色）</li>
+        <li>气质：产品/个人表达，克制留白，不靠终端皮肤堆「程序员感」</li>
+      </ul>
+    </div>
+
+    <div class="featured">
+      <div>
+        <div class="tag-rec">新推荐 · DIRECTION E</div>
+        <h2>Personal Soft</h2>
+        <p>
+          个人站定位：笔记优先、项目并行、Now 状态区展示近况。
+          主 CTA 是「阅读笔记 / 查看项目」，而不是「下载简历」。
+          另附笔记列表页原型，体现 digital garden 结构。
+        </p>
+        <div class="actions">
+          <a class="btn btn-dark" href="E-personal-soft.html" target="_blank">预览首页</a>
+          <a class="btn btn-light" href="E-notes.html" target="_blank">预览笔记页</a>
+          <a class="btn btn-light" href="previews/E-personal-soft.png" target="_blank">看 PNG</a>
+        </div>
+      </div>
+      <div class="preview-box">
+        <iframe src="E-personal-soft.html" title="E preview" loading="lazy"></iframe>
+      </div>
+    </div>
+
+    <h3 class="section">其余方向（可作对比或混搭素材）</h3>
+    <div class="grid">
+      <article class="card">
+        <div class="id">A · MIDNIGHT ENGINEER</div>
+        <h4>深色工程师极简</h4>
+        <p>求职专业感强，但偏作品集；字体与气质更「投递」，个人生活感弱。</p>
+        <div class="meta">适合：纯技术向求职包装</div>
+        <a href="A-midnight-engineer.html" target="_blank">预览 →</a>
+      </article>
+      <article class="card">
+        <div class="id">B · CLEAN LIGHT</div>
+        <h4>浅色亲和落地页</h4>
+        <p>HR 友好，但结构仍像服务介绍页，笔记/个人表达权重不足。</p>
+        <div class="meta">可借鉴：居中 Hero、能力三栏</div>
+        <a href="B-clean-light.html" target="_blank">预览 →</a>
+      </article>
+      <article class="card">
+        <div class="id">C · TERMINAL IDE</div>
+        <h4>编辑器极客风</h4>
+        <p>记忆点强，但与「个人网站 / 笔记阅读」目标冲突较大，不建议作主风格。</p>
+        <div class="meta">可作彩蛋页，不宜作全站</div>
+        <a href="C-terminal-ide.html" target="_blank">预览 →</a>
+      </article>
+      <article class="card">
+        <div class="id">D · AI AURORA</div>
+        <h4>炫彩 AI 产品感</h4>
+        <p>视觉冲击强；若与 E 混搭，可少量吸收渐变，但需大幅收敛，避免喧宾夺主。</p>
+        <div class="meta">可借鉴：柔和光晕点缀</div>
+        <a href="D-ai-aurora.html" target="_blank">预览 →</a>
+      </article>
+    </div>
+
+    <div class="compare">
+      <table>
+        <thead>
+          <tr>
+            <th>维度</th>
+            <th>E Personal Soft（新）</th>
+            <th>A 深色工程师</th>
+            <th>C 终端风</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>站点定位</td>
+            <td>个人站 + 笔记花园</td>
+            <td>求职作品集</td>
+            <td>极客身份展演</td>
+          </tr>
+          <tr>
+            <td>字体</td>
+            <td>宋体标题 + 现代正文</td>
+            <td>无衬线 + 等宽点缀</td>
+            <td>等宽主导</td>
+          </tr>
+          <tr>
+            <td>笔记/博客</td>
+            <td>一等导航与首页主区块</td>
+            <td>次要或缺失</td>
+            <td>弱</td>
+          </tr>
+          <tr>
+            <td>开源项目</td>
+            <td>与笔记并列</td>
+            <td>绝对主角</td>
+            <td>主角</td>
+          </tr>
+          <tr>
+            <td>求职用途</td>
+            <td>自然覆盖，不唯一目标</td>
+            <td>核心目标</td>
+            <td>间接</td>
+          </tr>
+          <tr>
+            <td>阅读体验</td>
+            <td>高（适合长文笔记）</td>
+            <td>中</td>
+            <td>中低</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="foot">
+      <strong>请你确认：</strong><br/>
+      1）是否以 <strong>E</strong> 作为主方向继续细化？<br/>
+      2）是否需要混搭（例：E 底 + D 的轻微光晕 / E + A 的深色夜间模式）？<br/>
+      3）笔记形态更偏「博客时间线」还是「digital garden 可生长笔记」？（E 当前偏后者）<br/><br/>
+      你拍板后，我再扩展 E 的完整多页高保真（笔记详情、项目、关于、联系），再进入开发。
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>00 · 视觉规范板 — Direction E</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&family=Noto+Serif+SC:wght@500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="shared.css" />
+<style>
+  .board { padding: 36px 28px 48px; }
+  h1 {
+    font-family: var(--font-serif);
+    font-size: 36px; font-weight: 600; margin-bottom: 8px;
+  }
+  .sub { color: var(--muted); font-weight: 500; margin-bottom: 28px; max-width: 640px; }
+  .grid { display: grid; grid-template-columns: 1.1fr 1fr; gap: 16px; }
+  .panel {
+    background: rgba(255,255,255,0.9);
+    border: 1px solid rgba(255,255,255,0.8);
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: var(--shadow-sm);
+  }
+  .panel h2 {
+    font-size: 14px; font-weight: 700; color: var(--accent);
+    letter-spacing: 0.04em; margin-bottom: 14px; text-transform: uppercase;
+  }
+  .swatches { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+  .swatch { border-radius: 14px; overflow: hidden; border: 1px solid var(--line); }
+  .swatch .c { height: 56px; }
+  .swatch .t { padding: 8px; font-size: 11px; font-weight: 600; color: var(--muted); background: #fff; }
+  .type-sample .display {
+    font-family: var(--font-serif);
+    font-size: 40px; font-weight: 600; line-height: 1.2; margin-bottom: 10px;
+  }
+  .type-sample .body { color: var(--ink-soft); font-size: 15px; font-weight: 500; margin-bottom: 8px; }
+  .type-sample .meta { font-size: 12px; font-weight: 600; color: var(--muted); }
+  .btn-row { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 14px; }
+  .layers {
+    font-size: 13px; font-weight: 500; color: var(--ink-soft); line-height: 1.7;
+  }
+  .layers code {
+    font-size: 12px; background: rgba(12,11,16,0.05); padding: 1px 6px; border-radius: 6px;
+  }
+  .demo-bg {
+    height: 140px; border-radius: 16px; border: 1px solid var(--line);
+    background-color: #f3f1ea;
+    background-image:
+      radial-gradient(rgba(12,11,16,0.045) 1px, transparent 1px),
+      radial-gradient(400px 180px at 20% 20%, rgba(124,108,255,0.28), transparent 60%),
+      radial-gradient(360px 160px at 90% 30%, rgba(20,184,166,0.18), transparent 55%),
+      radial-gradient(300px 140px at 50% 100%, rgba(244,114,182,0.12), transparent 55%);
+    background-size: 18px 18px, auto, auto, auto;
+    margin-bottom: 12px;
+  }
+  .full { grid-column: 1 / -1; }
+  @media (max-width: 860px) { .grid, .swatches { grid-template-columns: 1fr 1fr; } }
+</style>
+</head>
+<body>
+  <div class="page">
+    <div class="proto-bar"><div>00 · STYLE BOARD · DIRECTION E</div><span>色彩 · 字体 · 控件 · 背景层</span></div>
+    <div class="board container">
+      <h1>Personal Soft · 视觉规范</h1>
+      <p class="sub">锁定方向 E。背景必须多层：暖纸基色 + 紫/青/玫瑰光斑 + 点阵纹理，避免单调平涂。</p>
+
+      <div class="grid">
+        <div class="panel">
+          <h2>Color</h2>
+          <div class="swatches">
+            <div class="swatch"><div class="c" style="background:#f3f1ea"></div><div class="t">bg-base</div></div>
+            <div class="swatch"><div class="c" style="background:#ffffff"></div><div class="t">elevated</div></div>
+            <div class="swatch"><div class="c" style="background:#0c0b10"></div><div class="t">ink</div></div>
+            <div class="swatch"><div class="c" style="background:#5b4dff"></div><div class="t">accent</div></div>
+            <div class="swatch"><div class="c" style="background:#0f9f8a"></div><div class="t">accent-2</div></div>
+            <div class="swatch"><div class="c" style="background:#14131a"></div><div class="t">band</div></div>
+            <div class="swatch"><div class="c" style="background:linear-gradient(135deg,#8b7cff,#5b4dff,#14b8a6)"></div><div class="t">logo</div></div>
+            <div class="swatch"><div class="c" style="background:rgba(91,77,255,0.12)"></div><div class="t">accent-soft</div></div>
+          </div>
+        </div>
+
+        <div class="panel type-sample">
+          <h2>Typography</h2>
+          <div class="display">写一点笔记，做一些东西</div>
+          <div class="body">正文 Inter + Noto Sans SC · 16–17px · 行高 1.7。适合中文长文阅读，不使用全站等宽。</div>
+          <div class="meta">Display: Noto Serif SC 600 · 48–58px</div>
+        </div>
+
+        <div class="panel">
+          <h2>Components</h2>
+          <div class="btn-row">
+            <span class="btn btn-dark">阅读笔记</span>
+            <span class="btn btn-light">查看项目</span>
+            <span class="btn btn-soft">相关链接</span>
+          </div>
+          <div class="btn-row">
+            <span class="chip is-active">全部</span>
+            <span class="chip">Agent</span>
+            <span class="chip">RAG</span>
+            <span class="tag tag-accent">Essay</span>
+            <span class="tag">Python</span>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h2>Background Layers</h2>
+          <div class="demo-bg"></div>
+          <div class="layers">
+            L0 基色 <code>#F3F1EA</code><br/>
+            L1 紫 / 青 / 玫瑰 radial 光斑（低饱和）<br/>
+            L2 纵向轻 vignette<br/>
+            L3 点阵纹理 22px · opacity ~4%<br/>
+            L4 白卡片内容层抬升
+          </div>
+        </div>
+
+        <div class="panel full">
+          <h2>IA Snapshot</h2>
+          <div class="layers">
+            导航：首页 · <strong>笔记</strong> · 项目 · 关于 · 订阅<br/>
+            首页：Hero → Now → 最新笔记 → 项目 → 关于 Band<br/>
+            笔记：列表筛选 + 详情窄栏阅读 + Seed 生长态<br/>
+            原则：个人站优先；求职为附带用途；背景禁止单色平涂
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
