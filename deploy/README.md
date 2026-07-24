@@ -13,7 +13,7 @@
 | XHAgentOS 前端 / 后端 | `18082` / `18002` |
 | **个人站（本项目）** | **`18083`** |
 
-默认访问：`http://公网IP:18083/`
+默认访问：`http://服务器地址:18083/`（生产建议通过 `SERVER_PUBLIC_URL` 显式配置 canonical/sitemap URL）
 
 ---
 
@@ -30,7 +30,7 @@
 | `SERVER_PASSWORD` | 远程部署 | SSH 密码 |
 | `SERVER_PORT` | 可选 | 默认 `22` |
 | `HTTP_PORT` | 可选 | 默认 `18083` |
-| `SERVER_PUBLIC_URL` | 可选 | 写入站点构建，默认 `http://1.14.106.17:18083` |
+| `SERVER_PUBLIC_URL` | 可选（生产推荐） | 写入站点构建的 canonical/sitemap URL；不配置时仅使用本地中性地址，不应作为公网生产配置 |
 
 未配置 `SERVER_HOST` 时：流水线**只推镜像**，不上机。
 
@@ -88,7 +88,7 @@ curl -fsS http://127.0.0.1:18083/ | head
 cd site
 docker build -t "$DOCKER_USERNAME/personal-dev-website:latest" \
   --build-arg DEPLOY_TARGET=server \
-  --build-arg SERVER_PUBLIC_URL=http://1.14.106.17:18083 \
+  --build-arg SERVER_PUBLIC_URL="${SERVER_PUBLIC_URL:-http://127.0.0.1:18083}" \
   .
 docker push "$DOCKER_USERNAME/personal-dev-website:latest"
 ```

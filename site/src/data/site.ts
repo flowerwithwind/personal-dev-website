@@ -13,9 +13,8 @@ export const siteConfig = {
   /** Resume file under public/ */
   resumePath: '/resume.pdf',
   /**
-   * SHA-256 hex of admin password.
-   * Default password: `haiyi2026` — change hash after you set a new password.
-   * Generate: `python -c "import hashlib;print(hashlib.sha256(b'YOUR_PASS').hexdigest())"`
+   * SHA-256 hex for the local demo editor password.
+   * This value is public in a static build and is not server authentication.
    */
   adminPasswordSha256: DEFAULT_ADMIN_PASSWORD_SHA256,
 };

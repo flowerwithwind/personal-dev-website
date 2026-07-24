@@ -4,19 +4,14 @@ on:
   push:
     branches: [master, main]
   workflow_dispatch:
-    inputs:
-      skip_tests:
-        description: "跳过测试"
-        required: false
-        default: "false"
-        type: choice
-        options: ["false", "true"]
+
+permissions:
+  contents: read
 
 jobs:
   test:
     name: Test and build site
     runs-on: ubuntu-latest
-    if: github.event_name != 'workflow_dispatch' || inputs.skip_tests != 'true'
     defaults:
       run:
         working-directory: site
@@ -28,27 +23,59 @@ jobs:
           cache: npm
           cache-dependency-path: site/package-lock.json
       - run: npm ci
-      - run: npm test
-      - name: Resolve public URL for test build
-        id: pub
-        run: |
-          if [ -n "${{ secrets.SERVER_PUBLIC_URL }}" ]; then
-            echo "url=${{ secrets.SERVER_PUBLIC_URL }}" >> "$GITHUB_OUTPUT"
-          else
-            echo "url=http://1.14.106.17:18083" >> "$GITHUB_OUTPUT"
-          fi
+      - run: npm run check
       - run: npm run build
         env:
-          DEPLOY_TARGET: server
-          SERVER_PUBLIC_URL: ${{ steps.pub.outputs.url }}
+          DEPLOY_TARGET: github
+      - run: npm test
 
-  deploy:
-    name: Build push and remote deploy
-    needs: [test]
-    if: |
-      always() &&
-      (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main') &&
-      (needs.test.result == 'success' || needs.test.result == 'skipped')
+  gate:
+    name: Check optional server publish configuration
+    needs: test
+    runs-on: ubuntu-latest
+    outputs:
+      docker_ready: ${{ steps.check.outputs.docker_ready }}
+      remote_ready: ${{ steps.check.outputs.remote_ready }}
+    env:
+      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+      SERVER_HOST: ${{ secrets.SERVER_HOST }}
+      SERVER_USER: ${{ secrets.SERVER_USER }}
+      SERVER_PASSWORD: ${{ secrets.SERVER_PASSWORD }}
+    steps:
+      - id: check
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker_ready=false
+          remote_ready=false
+          if [[ -n "$DOCKER_USERNAME" && -n "$DOCKER_PASSWORD" ]]; then
+            docker_ready=true
+          fi
+          if [[ -n "$SERVER_HOST" ]]; then
+            if [[ -z "$DOCKER_USERNAME" || -z "$DOCKER_PASSWORD" ]]; then
+              echo "::error::SERVER_HOST requires Docker Hub credentials so the server can pull the image."
+              exit 1
+            fi
+            if [[ -z "$SERVER_USER" || -z "$SERVER_PASSWORD" ]]; then
+              echo "::error::SERVER_HOST requires SERVER_USER and SERVER_PASSWORD (or update workflow for SSH key auth)."
+              exit 1
+            fi
+            remote_ready=true
+          fi
+          echo "docker_ready=$docker_ready" >> "$GITHUB_OUTPUT"
+          echo "remote_ready=$remote_ready" >> "$GITHUB_OUTPUT"
+          echo "Docker Hub publish configured: $docker_ready"
+          if [[ -n "$SERVER_HOST" ]]; then
+            echo "Remote deployment configured: $remote_ready"
+          else
+            echo "SERVER_HOST not configured; server job will publish Hub-only if credentials exist."
+          fi
+
+  server:
+    name: Build and publish server image
+    needs: [test, gate]
+    if: needs.gate.outputs.docker_ready == 'true'
     runs-on: ubuntu-latest
     env:
       DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
@@ -59,35 +86,26 @@ jobs:
       SERVER_PORT: ${{ secrets.SERVER_PORT }}
       HTTP_PORT: ${{ secrets.HTTP_PORT }}
       SERVER_PUBLIC_URL: ${{ secrets.SERVER_PUBLIC_URL }}
+      IMAGE_TAG: ${{ github.sha }}
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Show config presence
-        run: |
-          echo "DOCKER_USERNAME: $([ -n \"$DOCKER_USERNAME\" ] && echo yes || echo NO)"
-          echo "SERVER_HOST: $([ -n \"$SERVER_HOST\" ] && echo yes || echo NO)"
-          echo "HTTP_PORT: ${HTTP_PORT:-18083}"
-
-      - name: Require Docker Hub
-        if: env.DOCKER_USERNAME == '' || env.DOCKER_PASSWORD == ''
-        run: |
-          echo "::error::配置 DOCKER_USERNAME / DOCKER_PASSWORD"
-          exit 1
-
       - name: Resolve build public URL
         id: build_url
+        shell: bash
         run: |
+          set -euo pipefail
           PORT="${HTTP_PORT:-18083}"
-          if [ -n "${SERVER_PUBLIC_URL:-}" ]; then
-            URL="${SERVER_PUBLIC_URL}"
-          elif [ -n "${SERVER_HOST:-}" ]; then
+          if [[ -n "${SERVER_PUBLIC_URL:-}" ]]; then
+            URL="$SERVER_PUBLIC_URL"
+          elif [[ -n "${SERVER_HOST:-}" ]]; then
             URL="http://${SERVER_HOST}:${PORT}"
           else
-            URL="http://1.14.106.17:18083"
+            URL="http://127.0.0.1:${PORT}"
+            echo "::warning::SERVER_PUBLIC_URL and SERVER_HOST are unset; building Hub-only image with local canonical URL."
           fi
           echo "url=${URL}" >> "$GITHUB_OUTPUT"
-          echo "Resolved SERVER_PUBLIC_URL for image: ${URL}"
 
       - uses: docker/setup-buildx-action@v3
       - uses: docker/login-action@v3
@@ -95,7 +113,7 @@ jobs:
           username: ${{ env.DOCKER_USERNAME }}
           password: ${{ env.DOCKER_PASSWORD }}
 
-      - name: Build and push image
+      - name: Build and push immutable image tags
         uses: docker/build-push-action@v6
         with:
           context: ./site
@@ -106,19 +124,14 @@ jobs:
             SERVER_PUBLIC_URL=${{ steps.build_url.outputs.url }}
             CACHEBUST=${{ github.sha }}
           tags: |
+            ${{ env.DOCKER_USERNAME }}/personal-dev-website:${{ env.IMAGE_TAG }}
             ${{ env.DOCKER_USERNAME }}/personal-dev-website:latest
-            ${{ env.DOCKER_USERNAME }}/personal-dev-website:${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      - name: Require SSH
-        if: env.SERVER_HOST != '' && (env.SERVER_USER == '' || env.SERVER_PASSWORD == '')
-        run: |
-          echo "::error::SERVER_HOST 需配合 SERVER_USER / SERVER_PASSWORD"
-          exit 1
-
-      - name: Prepare bundle
-        if: env.SERVER_HOST != ''
+      - name: Prepare deployment bundle
+        if: needs.gate.outputs.remote_ready == 'true'
+        shell: bash
         run: |
           set -euo pipefail
           rm -rf deploy-bundle
@@ -128,20 +141,18 @@ jobs:
           chmod +x deploy-bundle/remote-up.sh
           PORT="${HTTP_PORT:-18083}"
           PUBLIC_URL="${SERVER_PUBLIC_URL:-http://${SERVER_HOST}:${PORT}}"
-          cat > deploy-bundle/.env <<EOF
-          DOCKER_USERNAME=${DOCKER_USERNAME}
-          IMAGE_TAG=latest
-          HTTP_PORT=${PORT}
-          SERVER_PUBLIC_URL=${PUBLIC_URL}
-          EOF
-          sed -i 's/^[[:space:]]*//' deploy-bundle/.env
-          printf '%s' "${DOCKER_PASSWORD}" > deploy-bundle/.docker_password
+          {
+            printf 'DOCKER_USERNAME=%s\n' "$DOCKER_USERNAME"
+            printf 'IMAGE_TAG=%s\n' "$IMAGE_TAG"
+            printf 'HTTP_PORT=%s\n' "$PORT"
+            printf 'SERVER_PUBLIC_URL=%s\n' "$PUBLIC_URL"
+          } > deploy-bundle/.env
+          printf '%s' "$DOCKER_PASSWORD" > deploy-bundle/.docker_password
           chmod 600 deploy-bundle/.env deploy-bundle/.docker_password
           tar -C deploy-bundle -czf deploy-bundle.tgz .
-          ls -la deploy-bundle deploy-bundle.tgz
 
-      - name: Ensure remote dir
-        if: env.SERVER_HOST != ''
+      - name: Ensure remote directory
+        if: needs.gate.outputs.remote_ready == 'true'
         uses: appleboy/ssh-action@v1.2.0
         with:
           host: ${{ env.SERVER_HOST }}
@@ -157,20 +168,20 @@ jobs:
             fi
             mkdir -p /opt/personal-dev-website
 
-      - name: Upload bundle
-        if: env.SERVER_HOST != ''
+      - name: Upload deployment bundle
+        if: needs.gate.outputs.remote_ready == 'true'
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ env.SERVER_HOST }}
           username: ${{ env.SERVER_USER }}
           password: ${{ env.SERVER_PASSWORD }}
           port: ${{ env.SERVER_PORT != '' && env.SERVER_PORT || 22 }}
-          source: "deploy-bundle.tgz"
-          target: "/opt/personal-dev-website"
+          source: deploy-bundle.tgz
+          target: /opt/personal-dev-website
           overwrite: true
 
-      - name: Extract pull and start
-        if: env.SERVER_HOST != ''
+      - name: Pull and start remote service
+        if: needs.gate.outputs.remote_ready == 'true'
         uses: appleboy/ssh-action@v1.2.0
         env:
           REMOTE_DOCKER_PASS: ${{ env.DOCKER_PASSWORD }}
@@ -194,12 +205,6 @@ jobs:
             PORT="${PORT:-18083}"
             export HEALTH_URL="http://127.0.0.1:${PORT}/healthz"
             ./remote-up.sh
-            docker ps --filter name=personal-dev-website
-            curl -fsS "http://127.0.0.1:${PORT}/healthz" || true
-            curl -fsS "http://127.0.0.1:${PORT}/" | head -c 200 || true
-
-      - name: Hub only
-        if: env.SERVER_HOST == ''
-        run: |
-          echo "仅推送镜像: ${{ env.DOCKER_USERNAME }}/personal-dev-website:latest"
-          echo "配置 SERVER_HOST 后可自动上机到 /opt/personal-dev-website （端口 18083）"
+            docker compose ps
+            curl -fsS "http://127.0.0.1:${PORT}/healthz"
+            curl -fsS "http://127.0.0.1:${PORT}/" >/dev/null

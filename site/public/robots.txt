@@ -1,5 +1,0 @@
-User-agent: *
-Allow: /
-
-# Sitemap URL follows current host (github.io or custom domain)
-Sitemap: /sitemap-index.xml

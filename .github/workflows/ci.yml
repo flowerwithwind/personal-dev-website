@@ -6,6 +6,9 @@ on:
   push:
     branches: [master, main]
 
+permissions:
+  contents: read
+
 jobs:
   site:
     runs-on: ubuntu-latest
@@ -20,8 +23,8 @@ jobs:
           cache: npm
           cache-dependency-path: site/package-lock.json
       - run: npm ci
-      - run: npm test
+      - run: npm run check
       - run: npm run build
         env:
-          DEPLOY_TARGET: server
-          SERVER_PUBLIC_URL: http://1.14.106.17:18083
+          DEPLOY_TARGET: github
+      - run: npm test

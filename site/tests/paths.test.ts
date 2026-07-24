@@ -104,6 +104,13 @@ describe('nginx static rewrite contract', () => {
     expect(nginxConf).toMatch(/location\s+=\s+\/healthz/);
     expect(nginxConf).toMatch(/location\s+\/_astro\//);
   });
+
+  it('generates Pages-aware robots and sitemap after a build', () => {
+    const robots = fs.readFileSync(path.join(distRoot, 'robots.txt'), 'utf8');
+    const sitemap = fs.readFileSync(path.join(distRoot, 'sitemap-index.xml'), 'utf8');
+    expect(robots).toContain('Sitemap: https://flowerwithwind.github.io/personal-dev-website/sitemap-index.xml');
+    expect(sitemap).toContain('https://flowerwithwind.github.io/personal-dev-website/');
+  });
 });
 
 describe('dist file mapping for card/link targets', () => {
@@ -135,18 +142,23 @@ describe('dist file mapping for card/link targets', () => {
     const home = fs.readFileSync(path.join(distRoot, 'index.html'), 'utf8');
     const projectsPage = fs.readFileSync(path.join(distRoot, 'projects/index.html'), 'utf8');
 
+    const builtBase = home.includes('href="/personal-dev-website/')
+      ? '/personal-dev-website'
+      : '';
+
     for (const p of getAllProjects()) {
       const detail = getProjectDetailPath(p);
+      const builtDetail = `${builtBase}${detail}`;
       // homepage mini-project cards
-      expect(home).toContain(`href="${detail}"`);
-      expect(home).toContain(`data-detail-href="${detail}"`);
+      expect(home).toContain(`href="${builtDetail}"`);
+      expect(home).toContain(`data-detail-href="${builtDetail}"`);
       // project list / card detail
-      expect(projectsPage).toContain(`href="${detail}"`);
+      expect(projectsPage).toContain(`href="${builtDetail}"`);
     }
 
     for (const n of getAllNotes().slice(0, 3)) {
       const detail = noteDetailPath(n.slug);
-      expect(home).toContain(`href="${detail}"`);
+      expect(home).toContain(`href="${builtBase}${detail}"`);
     }
   });
 });

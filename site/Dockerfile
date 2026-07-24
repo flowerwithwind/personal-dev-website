@@ -7,8 +7,8 @@ ARG NPM_REGISTRY=https://registry.npmjs.org
 ARG CACHEBUST=1
 # server | github
 ARG DEPLOY_TARGET=server
-# 对外访问地址（sitemap / 绝对链接参考）
-ARG SERVER_PUBLIC_URL=http://1.14.106.17:18083
+# 对外访问地址（生产部署应显式传入；默认仅用于本地构建）
+ARG SERVER_PUBLIC_URL=http://127.0.0.1:18083
 
 WORKDIR /app
 

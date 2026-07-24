@@ -9,7 +9,6 @@ import { path } from '../lib/paths';
     data-animate="fade-up"
     id="admin-root"
     data-login-path={path('/login')}
-    data-notes-path={path('/notes')}
     data-local-base={path('/notes/local')}
   >
     <div class="gate card" id="admin-gate">
@@ -221,7 +220,6 @@ import { path } from '../lib/paths';
       root.dataset.bound = '1';
 
       var loginPath = root.getAttribute('data-login-path') || '/login';
-      var notesPath = root.getAttribute('data-notes-path') || '/notes';
       var localBase = root.getAttribute('data-local-base') || '/notes/local/';
       var gate = document.getElementById('admin-gate');
       var panel = document.getElementById('admin-panel');

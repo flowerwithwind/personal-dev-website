@@ -6,7 +6,7 @@ export const NOTES_DB_NAME = 'personal-site-notes-db';
 export const NOTES_DB_STORE = 'notes';
 export const AUTH_SESSION_HOURS = 12;
 
-/** SHA-256 of default password `haiyi2026` */
+/** SHA-256 of the local demo editor password (public static data, not real auth). */
 export const DEFAULT_ADMIN_PASSWORD_SHA256 =
   '11629f2659d6624fb4f10471d0383a5caace241d5cb9c6e0da37b3dfef362363';
 

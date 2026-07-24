@@ -7,15 +7,15 @@
  *
  * Docker 构建：
  *   ARG/ENV DEPLOY_TARGET=server
- *   ARG/ENV SERVER_PUBLIC_URL=http://1.14.106.17:18083
+ *   ARG/ENV SERVER_PUBLIC_URL=http://127.0.0.1:18083
  */
 export const customDomain = '';
 
 /** github | server — 可被环境变量 DEPLOY_TARGET 覆盖 */
 export const defaultDeployTarget = 'github';
 
-/** 服务器对外 URL（无自定义域名时的 server 模式） */
-export const defaultServerPublicUrl = 'http://1.14.106.17:18083';
+/** 中性本地 URL；生产服务器构建应显式注入 SERVER_PUBLIC_URL。 */
+export const defaultServerPublicUrl = 'http://127.0.0.1:18083';
 
 /** GitHub Pages 默认 */
 export const githubPages = {
@@ -34,14 +34,24 @@ function env(name, fallback = '') {
 export function getDeployTarget() {
   const t = (env('DEPLOY_TARGET', defaultDeployTarget) || defaultDeployTarget).toLowerCase();
   if (t === 'server' || t === 'github') return t;
-  return defaultDeployTarget;
+  throw new Error(`Unsupported DEPLOY_TARGET: ${t}. Expected github or server.`);
 }
 
 export function getServerPublicUrl() {
-  return (env('SERVER_PUBLIC_URL', defaultServerPublicUrl) || defaultServerPublicUrl).replace(
+  const value = (env('SERVER_PUBLIC_URL', defaultServerPublicUrl) || defaultServerPublicUrl).replace(
     /\/$/,
     '',
   );
+  let parsed;
+  try {
+    parsed = new URL(value);
+  } catch {
+    throw new Error(`Invalid SERVER_PUBLIC_URL: ${value}`);
+  }
+  if (!['http:', 'https:'].includes(parsed.protocol) || parsed.username || parsed.password) {
+    throw new Error('SERVER_PUBLIC_URL must be an http(s) URL without credentials.');
+  }
+  return value;
 }
 
 export function getSiteUrl() {
